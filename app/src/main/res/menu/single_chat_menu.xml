@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/show_profile"
+        android:title="@string/profile"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/single_chat_block"
+        android:title="@string/block"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/single_chat_report"
+        android:title="@string/report"
+        app:showAsAction="never" />
+
+</menu>

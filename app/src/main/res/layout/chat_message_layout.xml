@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="message"
+            type="com.leminect.strangee.model.Message" />
+
+        <variable
+            name="clickListener"
+            type="com.leminect.strangee.adapter.ChatMessageClickListener" />
+
+        <variable
+            name="amISender"
+            type="Boolean" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:onClick="@{() -> clickListener.onClick(message)}"
+        android:orientation="vertical"
+        tools:background="#E91E63">
+
+        <View
+            android:id="@+id/message_separation"
+            android:layout_width="match_parent"
+            android:layout_height="14dp"/>
+
+        <TextView
+            android:id="@+id/time_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            tools:text="9:43 AM"
+            android:fontFamily="@font/poppins_light"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/sender_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/message_margin"
+            android:background="@drawable/sender_text_background"
+            android:fontFamily="@font/poppins"
+            android:paddingStart="18dp"
+            android:paddingTop="9dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="9dp"
+            android:lineSpacingMultiplier="0.9"
+            android:layout_gravity="end"
+            app:chatText="@{message}"
+            app:chatTextVisible="@{amISender}"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            tools:text="I'm pretty good. I'm pretty good. I'm pretty good. I'm pretty good." />
+
+        <TextView
+            android:id="@+id/receiver_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/message_margin"
+            android:background="@drawable/receiver_text_background"
+            android:fontFamily="@font/poppins"
+            android:paddingStart="18dp"
+            android:paddingTop="9dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="9dp"
+            android:textColor="#242134"
+            android:textSize="15sp"
+            android:layout_gravity="start"
+            android:lineSpacingMultiplier="0.9"
+            app:chatText="@{message}"
+            app:chatTextVisible="@{!amISender}"
+            tools:text="I'm pretty good. I'm pretty good. I'm pretty good. I'm pretty good." />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/message_margin"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                app:chatImage="@{message}"
+                app:chatImageVisible="@{amISender}"
+                android:scaleType="centerCrop"
+                tools:src="@tools:sample/backgrounds/scenic" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/message_margin"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:scaleType="centerCrop"
+                app:chatImage="@{message}"
+                app:chatImageVisible="@{!amISender}"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</layout>

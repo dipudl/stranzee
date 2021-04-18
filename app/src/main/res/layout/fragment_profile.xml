@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".view.ProfileFragment">
+
+    <data>
+
+        <variable
+            name="user"
+            type="com.leminect.strangee.model.User" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/change_profile_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profileCircleImageView"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:civ_border_color="@color/main_blue"
+                    app:civ_border_width="6dp"
+                    app:imgUrl="@{user.imageUrl}"
+                    app:userId="@{user.userId}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@drawable/placeholder_profile_pic" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="98dp"
+                    android:contentDescription="@string/change_profile_picture"
+                    android:src="@drawable/ic_edit_profile_pic"
+                    app:layout_constraintBottom_toBottomOf="@+id/profileCircleImageView"
+                    app:layout_constraintStart_toStartOf="@+id/profileCircleImageView"
+                    app:layout_constraintTop_toTopOf="@+id/profileCircleImageView" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:fontFamily="@font/poppins_medium"
+                android:textAlignment="center"
+                android:textColor="@color/profile_page_black_text"
+                android:textSize="26sp"
+                app:firstName="@{user.firstName}"
+                app:lastName="@{user.lastName}"
+                app:showFullName="@{true}"
+                tools:text="Dylan Mordin" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.2dp"
+                android:layout_marginTop="27dp"
+                android:background="#707070" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/editProfileLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/edit_details_background"
+                    android:paddingStart="9dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="9dp"
+                    android:paddingBottom="6dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/ic_edit_details"
+                        android:contentDescription="@string/edit_profile_details" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="7dp"
+                        android:fontFamily="@font/poppins"
+                        android:text="@string/edit_details"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="9dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/name"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/profile_page_black_text"
+                    android:textSize="16sp"
+                    app:firstName="@{user.firstName}"
+                    app:lastName="@{user.lastName}"
+                    app:showFullName="@{true}"
+                    tools:text="Dylan Mordin" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/country"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="@{user.country}"
+                    android:textColor="@color/profile_page_black_text"
+                    android:textSize="16sp"
+                    tools:text="United States" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/about_me"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="@{user.aboutMe}"
+                    android:textColor="@color/profile_page_black_text"
+                    android:textSize="16sp"
+                    tools:text="I am Dylan, one of the highly passionate bloggers and tech enthusiast. Interested in making new friends worldwide." />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/email"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="@{user.email}"
+                    android:textColor="@color/profile_page_black_text"
+                    android:textSize="16sp"
+                    tools:text="dylan.mardin@mail.com" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/gender"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="@{user.gender}"
+                    android:textColor="@color/profile_page_black_text"
+                    android:textSize="16sp"
+                    tools:text="Male" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/birthday"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="@{user.formatTime()}"
+                    android:textColor="@color/profile_page_black_text"
+                    android:textSize="16sp"
+                    tools:text="23 Oct, 1998" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/interested_in"
+                    android:textColor="@color/profile_page_light_black_text"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/interests_chip_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="24dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

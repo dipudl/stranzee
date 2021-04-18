@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="chatPerson"
+            type="com.leminect.strangee.model.SingleChatPerson" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_chat_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/go_back" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/change_profile_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="10dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileCircleImageView"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:civ_border_color="@color/white"
+                app:civ_border_width="1.5dp"
+                app:imgUrl="@{chatPerson.imageUrl}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/placeholder_profile_pic" />
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_margin="1dp"
+                android:contentDescription="@string/online_indicator"
+                android:src="@drawable/ic_online"
+                app:imageVisible="@{chatPerson.online}"
+                app:layout_constraintBottom_toBottomOf="@+id/profileCircleImageView"
+                app:layout_constraintStart_toStartOf="@+id/profileCircleImageView" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            tools:text="Dylan M."
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:firstName="@{chatPerson.firstName}"
+            app:lastName="@{chatPerson.lastName}"
+            app:showFullName="@{false}"
+            android:textAlignment="center"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</layout>

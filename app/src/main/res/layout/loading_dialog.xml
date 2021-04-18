@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/loading_dialog_background">
+
+        <LinearLayout
+            android:id="@+id/horizontalLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/horizontalAnim"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.6"
+                app:lottie_rawRes="@raw/loading_spinner"
+                app:lottie_autoPlay="true"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:id="@+id/horizontalTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.4"
+                android:textColor="@color/sign_up_page_black_text"
+                tools:text="@string/interested_in_popup_text"
+                android:fontFamily="@font/poppins"
+                android:textSize="16sp"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="28dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/verticalLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/vertical_anim"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_margin="8dp"
+                app:lottie_rawRes="@raw/thumbs_up"
+                app:lottie_autoPlay="true"
+                android:scaleType="fitCenter"/>
+
+            <TextView
+                android:id="@+id/verticalTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/sign_up_page_black_text"
+                tools:text="@string/interested_in_popup_text"
+                android:fontFamily="@font/poppins"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="32dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/interests_chip_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:checkable="false"
+    android:textAppearance="@style/ChipText"
+    android:textColor="@color/white"
+    app:chipBackgroundColor="@color/main_blue"
+    app:closeIcon="@drawable/ic_remove_saved_profile"
+    app:closeIconTint="@null"
+    tools:text="Technology" />

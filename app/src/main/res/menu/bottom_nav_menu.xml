@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/findFragment"
+        android:icon="@drawable/ic_search"
+        android:title="@string/find" />
+    <item
+        android:id="@+id/chatFragment"
+        android:icon="@drawable/ic_chat_nav_selected"
+        android:title="@string/chat" />
+    <item
+        android:id="@+id/savedFragment"
+        android:icon="@drawable/ic_save"
+        android:title="@string/saved" />
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/profile" />
+
+</menu>

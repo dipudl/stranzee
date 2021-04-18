@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main_navigation"
+    app:startDestination="@id/findFragment">
+
+    <fragment
+        android:id="@+id/findFragment"
+        android:name="com.leminect.strangee.view.FindFragment"
+        android:label="Find" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.leminect.strangee.view.ChatFragment"
+        android:label="ChatFragment" />
+    <fragment
+        android:id="@+id/savedFragment"
+        android:name="com.leminect.strangee.view.SavedFragment"
+        android:label="Saved" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.leminect.strangee.view.ProfileFragment"
+        android:label="Profile" />
+</navigation>
