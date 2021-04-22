@@ -13,9 +13,8 @@ class HybridDialog(
     private val texts: Array<String>,
     dismissOnTouchOutside: Boolean,
     private val okListener: OkButtonListener,
-    okButtonText:String = "OK",
-    cancelButtonText:String = "Cancel"
-
+    okButtonText: String = "OK",
+    cancelButtonText: String = "Cancel",
 ) {
     private var alert: AlertDialog.Builder = AlertDialog.Builder(mContext)
     private var binding: DialogLayoutBinding

@@ -10,6 +10,7 @@ import android.text.SpannableString
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -23,6 +24,7 @@ import com.leminect.strangee.utility.saveUserToSharedPrefs
 import com.leminect.strangee.viewmodel.LoginStatus
 import com.leminect.strangee.viewmodel.LoginViewModel
 import com.leminect.strangee.viewmodel.SignUpViewModel
+import java.lang.Exception
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -33,10 +35,23 @@ class LoginActivity : AppCompatActivity() {
         ViewModelProvider(this).get(LoginViewModel::class.java)
     }
 
+    companion object {
+        var currentActivity: Activity? = null
+        fun finishActivity() {
+            try {
+                currentActivity?.finish()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         binding.lifecycleOwner = this
+
+        currentActivity = this
 
         val ss: SpannableString = SpannableString(getString(R.string.agree_terms_and_policy))
 

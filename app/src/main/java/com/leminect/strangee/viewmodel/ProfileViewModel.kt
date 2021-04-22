@@ -26,12 +26,12 @@ class ProfileViewModel : ViewModel() {
 
     private val viewModelJob = Job()
 
-    fun updateProfileImage(token: String, profileImageUri: Uri, userId: String) {
+    fun updateProfileImage(token: String, profileImagePath: String, userId: String) {
         viewModelScope.launch {
             try {
                 _status.value = ProfileUpdateStatus.UPDATING
 
-                val file: File = File(profileImageUri.path!!)
+                val file: File = File(profileImagePath)
                 val requestBody: RequestBody =
                     RequestBody.create(MediaType.parse(file.getMimeType("image/png")), file)
                 val part: MultipartBody.Part =

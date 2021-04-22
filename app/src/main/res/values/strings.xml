@@ -345,8 +345,14 @@
     <string name="no_profile_found">No profile found for current filter.</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
-    <string name="contact_us_text">For any questions or concerns please email us at mail@example.com</string>
+    <string name="contact_us_text">For any questions or concerns please email us at leminect@gmail.com</string>
     <string name="share_text">Hey, Join me on %s, a free and amazing app for meeting with strangers &amp; making new friends. \n\n Play Store link: https://play.google.com/store/apps/details?id=%s</string>
+    <string name="no_profile_saved">No profile saved</string>
+    <string name="error_loading_saved_profiles">Error loading saved profiles. Please check your internet connection.</string>
+    <string name="failed_loading_saved">Failed to load saved profiles</string>
+    <string name="nobody_visited">Nobody visited your profile</string>
+    <string name="failed_to_load_profiles">Failed to load the profiles</string>
+    <string name="error_loading_profiles">Error loading profiles. Please check your internet connection.</string>
 
     <bool name="_true">true</bool>
     <bool name="_false">false</bool>

@@ -62,7 +62,7 @@ class SignUpViewModel : ViewModel() {
             try {
                 _status.value = SignUpStatus.SIGNING_UP
 
-                val file: File = File(Uri.parse(user.imageUrl).path!!)
+                val file: File = File(user.imageUrl)
                 val requestBody: RequestBody =
                     RequestBody.create(MediaType.parse(file.getMimeType("image/png")), file)
                 val part: MultipartBody.Part =

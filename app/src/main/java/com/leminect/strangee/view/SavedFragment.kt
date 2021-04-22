@@ -1,6 +1,7 @@
 package com.leminect.strangee.view
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,23 +12,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.leminect.strangee.R
 import com.leminect.strangee.adapter.StrangeeClickListener
 import com.leminect.strangee.adapter.StrangeeGridAdapter
 import com.leminect.strangee.databinding.FragmentSavedBinding
 import com.leminect.strangee.model.Strangee
+import com.leminect.strangee.utility.getFromSharedPreferences
+import com.leminect.strangee.utility.showKeyboard
+import com.leminect.strangee.viewmodel.FindViewModel
+import com.leminect.strangee.viewmodel.SavedStatus
+import com.leminect.strangee.viewmodel.SavedViewModel
+import com.leminect.strangee.viewmodelfactory.FindViewModelFactory
+import com.leminect.strangee.viewmodelfactory.SavedViewModelFactory
+import java.util.*
 
 
 class SavedFragment : Fragment() {
 
     lateinit var binding: FragmentSavedBinding
-    private val placeholderText = "I am Dylan, one of the highly passionate blogger and tech enthusiast. " +
-            "Interested in making new friends worldwide."
-    private val placeholderImage = listOf(
-        "https://images.unsplash.com/photo-1456327102063-fb5054efe647?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=f05c14dd4db49f08a789e6449604c490",
-        "https://images.unsplash.com/photo-1464863979621-258859e62245?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=d1ff5086e5ca75cda4bcc8e470d8af11",
-        "https://images.pexels.com/photos/61100/pexels-photo-61100.jpeg?crop=faces&fit=crop&h=200&w=200&auto=compress&cs=tinysrgb"
-    )
+    private lateinit var viewModel: SavedViewModel
+    private lateinit var adapter: StrangeeGridAdapter
+    private var filterText: String = ""
+    private var showFilter: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,28 +44,99 @@ class SavedFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_saved, container, false)
         setUpCustomActionBar()
 
-        val adapter = StrangeeGridAdapter(StrangeeClickListener({ strangee ->
-            Toast.makeText(context, strangee.toString(), Toast.LENGTH_SHORT).show()
+        binding.lifecycleOwner = this
+        val pair = getFromSharedPreferences(requireContext())
+        val token = pair.first
+        val user = pair.second
+
+        val viewModelFactory = SavedViewModelFactory(token, user.userId)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(SavedViewModel::class.java)
+
+        adapter = StrangeeGridAdapter(StrangeeClickListener({ strangee ->
+            viewModel.displaySavedProfile(strangee)
         }, {}, { strangee ->
-            Toast.makeText(context, strangee.saved.toString(), Toast.LENGTH_SHORT).show()
+            viewModel.removeSavedProfile(token, strangee.userId)
         }), true)
 
         binding.savedRecyclerView.adapter = adapter
 
-        val listData = listOf<Strangee>(
-            Strangee("abcd", "Edmund", "Paul", placeholderImage[0],
-                "United States", "Male", listOf("Swimming", "Technology", "Music", "Blogging"),
-                885566388000, placeholderText, true),
-            Strangee("abcd", "Edmund", "Paul", placeholderImage[1],
-                "United States", "Male", listOf("Swimming", "Technology", "Music", "Blogging"),
-                885566388000, placeholderText, true),
-            Strangee("abcd", "Edmund", "Paul", placeholderImage[2],
-                "United States", "Male", listOf("Swimming", "Technology", "Music", "Blogging"),
-                885566388000, placeholderText, true)
-        )
-        adapter.submitList(listData)
+        viewModel.savedList.observe(viewLifecycleOwner, Observer { savedList ->
+            savedList?.let {
+//                adapter.submitList(savedList)
+                filterSearch(savedList)
+            }
+        })
+
+        binding.reloadButton.setOnClickListener {
+            viewModel.getSavedList(token, user.userId)
+        }
+
+        viewModel.status.observe(viewLifecycleOwner, Observer { status ->
+            status?.let {
+                when (status) {
+                    SavedStatus.LOADING -> {
+                        binding.reloadButton.visibility = View.GONE
+                        binding.statusAnimation.apply {
+                            setAnimation(R.raw.loading_animation)
+                            visibility = View.VISIBLE
+                            if (!this.isAnimating) this.playAnimation()
+                        }
+                        binding.errorTextView.visibility = View.GONE
+                    }
+                    SavedStatus.ERROR -> {
+                        binding.reloadButton.visibility = View.VISIBLE
+                        binding.statusAnimation.apply {
+                            setAnimation(R.raw.internet_error_anim)
+                            visibility = View.VISIBLE
+                            if (!this.isAnimating) this.playAnimation()
+                        }
+                        binding.errorTextView.text =
+                            getString(R.string.error_loading_saved_profiles)
+                        binding.errorTextView.visibility = View.VISIBLE
+                    }
+                    SavedStatus.FAILED -> {
+                        binding.reloadButton.visibility = View.VISIBLE
+                        binding.statusAnimation.apply {
+                            setAnimation(R.raw.internet_error_anim)
+                            visibility = View.VISIBLE
+                            if (!this.isAnimating) this.playAnimation()
+                        }
+                        binding.errorTextView.text = getString(R.string.failed_loading_saved)
+                        binding.errorTextView.visibility = View.VISIBLE
+                    }
+                    SavedStatus.EMPTY -> {
+                        binding.reloadButton.visibility = View.GONE
+                        binding.statusAnimation.apply {
+                            setAnimation(R.raw.no_results_found)
+                            visibility = View.VISIBLE
+                            if (!this.isAnimating) this.playAnimation()
+                        }
+                        binding.errorTextView.text = getString(R.string.no_profile_saved)
+                        binding.errorTextView.visibility = View.VISIBLE
+                    }
+                    SavedStatus.DONE -> {
+                        binding.reloadButton.visibility = View.GONE
+                        binding.statusAnimation.visibility = View.GONE
+                        binding.errorTextView.visibility = View.GONE
+                    }
+                }
+            }
+        })
+
+        viewModel.navigateToSelectedProfile.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                goToSavedProfile(it)
+                viewModel.onDisplaySavedProfileComplete()
+            }
+        })
 
         return binding.root
+    }
+
+    private fun goToSavedProfile(strangee: Strangee) {
+        val intent: Intent = Intent(context, StrangeeProfileActivity::class.java)
+        intent.putExtra("strangee_data", strangee)
+        startActivity(intent)
     }
 
     private fun setUpCustomActionBar() {
@@ -76,24 +155,46 @@ class SavedFragment : Fragment() {
         searchButton?.apply {
             visibility = View.VISIBLE
             setImageResource(R.drawable.ic_search)
-            setOnClickListener{
+            setOnClickListener {
                 searchEditText?.setText("")
                 searchEditText?.requestFocus()
                 mainLayout?.visibility = View.GONE
                 searchLayout?.visibility = View.VISIBLE
+
+                showKeyboard(searchEditText)
             }
         }
 
-        backButton?.setOnClickListener{
+        backButton?.setOnClickListener {
             val imm: InputMethodManager =
                 requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(searchEditText?.windowToken, 0)
+            adapter.submitList(viewModel.savedList.value)
             mainLayout?.visibility = View.VISIBLE
             searchLayout?.visibility = View.GONE
+
+            showFilter = false
         }
 
         searchEditText?.doOnTextChanged { text, start, before, count ->
-            // filterSearch(text.toString())
+            showFilter = true
+            filterText = text?.toString()?.toLowerCase(Locale.ROOT) ?: ""
+            filterSearch(viewModel.savedList.value)
+        }
+    }
+
+    private fun filterSearch(savedList: List<Strangee>?) {
+        if(showFilter) {
+            if (savedList != null) {
+                val filterList = savedList.filter {
+                    "${it.firstName} ${it.lastName[0]}.".toLowerCase(Locale.ROOT)
+                        .contains(filterText)
+                            || it.country.toLowerCase(Locale.ROOT).contains(filterText)
+                }
+                adapter.submitList(filterList)
+            }
+        } else {
+            adapter.submitList(savedList)
         }
     }
 }

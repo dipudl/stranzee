@@ -9,6 +9,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.loader.content.CursorLoader
 import com.leminect.strangee.R
@@ -19,6 +20,13 @@ import java.util.*
 
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
+}
+
+fun Fragment.showKeyboard(view: View?) {
+    view?.let {
+        val inputMethodManager: InputMethodManager? = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    }
 }
 
 fun Activity.hideKeyboard() {

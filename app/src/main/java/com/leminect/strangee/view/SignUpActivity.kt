@@ -31,8 +31,10 @@ import com.leminect.strangee.utility.hideKeyboard
 import com.leminect.strangee.utility.saveUserToSharedPrefs
 import com.leminect.strangee.viewmodel.SignUpStatus
 import com.leminect.strangee.viewmodel.SignUpViewModel
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
+import com.canhub.cropper.CropImage
+import com.canhub.cropper.CropImageActivity
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.tsongkha.spinnerdatepicker.DatePickerDialog
 import com.tsongkha.spinnerdatepicker.SpinnerDatePickerDialogBuilder
 import java.text.SimpleDateFormat
@@ -45,7 +47,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var mDateSetListener: DatePickerDialog.OnDateSetListener
     private val interestList = ArrayList<String>()
     private lateinit var user: User
-    private var photoUri: Uri? = null
+    private var photoPath: String? = null
     private var birthday: Long? = null
     private var errorEnabled = false
     private lateinit var errorHybridDialog: HybridDialog
@@ -121,7 +123,7 @@ class SignUpActivity : AppCompatActivity() {
 
                 hideKeyboard()
                 accountCreatedDialog.showDialog()
-                object : CountDownTimer(4000, 4000) {
+                object : CountDownTimer(2500, 2500) {
                     override fun onTick(millisUntilFinished: Long) {
                     }
 
@@ -171,7 +173,7 @@ class SignUpActivity : AppCompatActivity() {
 
             errorEnabled = true
 
-            if (photoUri == null) {
+            if (photoPath == null) {
                 Toast.makeText(this, "Please add your profile picture", Toast.LENGTH_LONG).show()
 
             } else if (firstName.trim().isEmpty()) {
@@ -222,7 +224,7 @@ class SignUpActivity : AppCompatActivity() {
                 user = User(
                     firstName,
                     lastName,
-                    photoUri.toString(),
+                    photoPath!!,
                     country,
                     gender,
                     interestList.toList(),
@@ -287,6 +289,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun goToNextActivity() {
         val intent: Intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        LoginActivity.finishActivity()
         finish()
     }
 
@@ -425,7 +428,7 @@ class SignUpActivity : AppCompatActivity() {
 
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
 
-            val imageUri: Uri = CropImage.getPickImageResultUri(this@SignUpActivity, data);
+            val imageUri: Uri = CropImage.getPickImageResultUriContent(this@SignUpActivity, data);
 
             if (CropImage.isReadExternalStoragePermissionsRequired(this@SignUpActivity,
                     imageUri)
@@ -443,11 +446,11 @@ class SignUpActivity : AppCompatActivity() {
             }
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (data != null) {
-                val result: CropImage.ActivityResult = CropImage.getActivityResult(data);
+                val result = CropImage.getActivityResult(data);
 
                 if (resultCode == RESULT_OK && result != null) {
-                    photoUri = result.uri;
-                    binding.accountCircleImage.setImageURI(photoUri);
+                    photoPath = result.getUriFilePath(this)
+                    binding.accountCircleImage.setImageURI(result.uriContent);
                 } else {
                     Toast.makeText(this@SignUpActivity, "Failed to load image!", Toast.LENGTH_SHORT)
                         .show();

@@ -28,8 +28,8 @@ import com.leminect.strangee.utility.getFromSharedPreferences
 import com.leminect.strangee.viewmodel.ProfileUpdateStatus
 import com.leminect.strangee.viewmodel.ProfileViewModel
 import com.leminect.strangee.viewmodel.SignUpViewModel
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
+import com.canhub.cropper.CropImage
+import com.canhub.cropper.CropImageView
 import java.util.ArrayList
 
 class ProfileFragment : Fragment() {
@@ -175,7 +175,7 @@ class ProfileFragment : Fragment() {
 
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK) {
 
-            val imageUri: Uri = CropImage.getPickImageResultUri(requireContext(), data)
+            val imageUri: Uri = CropImage.getPickImageResultUriContent(requireContext(), data)
 
             if (CropImage.isReadExternalStoragePermissionsRequired(requireContext(), imageUri)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -191,14 +191,14 @@ class ProfileFragment : Fragment() {
             }
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (data != null) {
-                val result: CropImage.ActivityResult = CropImage.getActivityResult(data)
+                val result = CropImage.getActivityResult(data)
 
                 if (resultCode == AppCompatActivity.RESULT_OK && result != null) {
-                    photoUri = result.uri
+                    photoUri = result.uriContent
                     // binding.profileCircleImageView.setImageURI(photoUri)
 
                     // upload photo
-                    viewModel.updateProfileImage(token, result.uri, user.userId)
+                    viewModel.updateProfileImage(token, result.getUriFilePath(requireContext())!!, user.userId)
 
                 } else {
                     Toast.makeText(context, "Failed to load image!", Toast.LENGTH_SHORT).show()

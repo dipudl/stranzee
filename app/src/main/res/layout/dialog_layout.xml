@@ -58,7 +58,7 @@
                 android:fontFamily="@font/poppins"
                 tools:hint="@string/im_interested_in"
                 android:maxLength="150"
-                android:inputType="textMultiLine"
+                android:inputType="text"
                 android:textColor="@color/sign_up_page_black_text"
                 android:textSize="17sp" />
 

@@ -11,7 +11,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
-public const val BASE_URL = "http://192.168.1.101:3000/" //"10.0.2.2"
+public const val BASE_URL =
+    "http://192.168.1.101:3000/" // "http://10.0.2.2:3000/" // "http://192.168.1.101:3000/"
 
 private val moshi: Moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -50,6 +51,12 @@ data class SaveStrangeeBackData(
     val userId: String,
     val error: Boolean,
     val saveStatus: Boolean,
+)
+
+data class BlockProfileBackData(
+    val userId: String,
+    val error: Boolean,
+    val blockedStatus: Boolean,
 )
 
 data class SaveStrangeePostData(
@@ -105,6 +112,57 @@ interface StrangeeApiService {
     suspend fun postEditDetails(
         @Header("Authorization") token: String,
         @Body user: User,
+    ): Boolean
+
+    @GET("saved")
+    suspend fun getSaved(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+    ): List<Strangee>
+
+    @POST("removeSaved")
+    suspend fun removeSavedProfile(
+        @Header("Authorization") token: String,
+        @Query("savedUserId") savedUserId: String,
+    ): Boolean
+
+    @GET("blocked")
+    suspend fun getIsBlocked(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+    ): Boolean
+
+    @POST("block")
+    suspend fun postBlockProfile(
+        @Header("Authorization") token: String,
+        @Query("_id") strangeeUserId: String,
+        @Query("blockedStatus") blockedStatus: Boolean,
+    ): BlockProfileBackData
+
+    @POST("report")
+    suspend fun postReportProfile(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+        @Query("reportedUserId") strangeeUserId: String,
+        @Query("message") message: String,
+    ): Boolean
+
+    @POST("whoCheckedMe")
+    suspend fun postWhoCheckedMe(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+    ): Boolean
+
+    @GET("whoCheckedMe")
+    suspend fun getWhoCheckedMe(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+    ): List<Strangee>
+
+    @POST("removeWhoCheckedMe")
+    suspend fun removeWhoCheckedMe(
+        @Header("Authorization") token: String,
+        @Query("_id") strangeeUserId: String,
     ): Boolean
 }
 
