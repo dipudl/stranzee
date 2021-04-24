@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,14 +13,15 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.*
 import com.leminect.strangee.R
 import com.leminect.strangee.adapter.bindImageUrl
 import com.leminect.strangee.databinding.ActivityMainBinding
+import com.leminect.strangee.network.SocketManager
 import de.hdodenhof.circleimageview.CircleImageView
+import io.socket.emitter.Emitter
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
@@ -35,11 +37,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
+        prefs = getSharedPreferences(getString(R.string.shared_prefs_name), MODE_PRIVATE)
+        SocketManager.setUserId(prefs.getString(getString(R.string.prefs_user_id), "")!!)
+        SocketManager.setToken(prefs.getString(getString(R.string.prefs_token), "")!!)
+
         drawerLayout = binding.drawerLayout
         val navHeaderView = binding.navView.getHeaderView(0)
         headerTextView = navHeaderView.findViewById<TextView>(R.id.drawer_header_text)
         headerImageView = navHeaderView.findViewById<CircleImageView>(R.id.drawer_header_image)
-        prefs = getSharedPreferences(getString(R.string.shared_prefs_name), MODE_PRIVATE)
 
         navController = this.findNavController(R.id.navHostFragment)
         binding.bottomNavigationView.setupWithNavController(navController)
@@ -148,6 +153,17 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    /*var onConnect = Emitter.Listener {
+        //After getting a Socket.EVENT_CONNECT which indicate socket has been connected to server,
+        //send online status to the server.
+        mSocket.emit("status", "online")
+    }*/
+
+    var onDataFromServer = Emitter.Listener {
+        Log.i("MainActivitySocket", it.toString())
+    }
+
+
     private fun refreshDrawerHeader() {
         val fullName = prefs.getString(getString(R.string.prefs_firstName), "") + " " +
                 prefs.getString(getString(R.string.prefs_lastName), "")
@@ -178,8 +194,32 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration)
+    }
+
+    /*override fun onStart() {
+        SocketManager.setOnline(true)
+        super.onStart()
+    }
+
+    override fun onStop() {
+        SocketManager.setOnline(false)
+        super.onStop()
+    }*/
+
+    override fun onResume() {
+        super.onResume()
+        SocketManager.setOnline(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SocketManager.setOnline(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SocketManager.getSocket()?.disconnect()
     }
 }

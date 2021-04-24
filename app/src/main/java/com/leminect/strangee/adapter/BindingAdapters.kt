@@ -95,6 +95,16 @@ fun bindSaveProfileIcon(imageView: ImageView, isSaved: Boolean?) {
     }
 }
 
+@BindingAdapter("onlineOfflineIcon")
+fun bindOnlineOfflineIcon(imageView: ImageView, isOnline: Boolean?) {
+    isOnline?.let {
+        if (isOnline)
+            imageView.setImageResource(R.drawable.ic_online)
+        else
+            imageView.setImageResource(R.drawable.ic_offline)
+    }
+}
+
 @BindingAdapter("imageVisible")
 fun bindImageVisible(imageView: ImageView, show: Boolean?) {
     show?.let {

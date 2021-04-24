@@ -6,15 +6,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.leminect.strangee.model.Strangee
 import com.leminect.strangee.network.*
+import io.socket.emitter.Emitter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 
 enum class StrangeeProfileStatus { REPORTING, REPORT_DONE, ERROR, FAILED, DONE }
 
-class StrangeeProfileViewModel(token: String, private val strangeeId: String) : ViewModel() {
+class StrangeeProfileViewModel(token: String, userId: String, private val strangeeId: String) : ViewModel() {
+    private val timer: CountDownTimer
+    private val roomData: RoomData = RoomData(userId, strangeeId, "status", token)
+
+    private val _isOnline = MutableLiveData<Boolean>()
+    val isOnline: LiveData<Boolean>
+        get() = _isOnline
+
     private val _status = MutableLiveData<StrangeeProfileStatus>()
     val status: LiveData<StrangeeProfileStatus>
         get() = _status
@@ -36,12 +45,20 @@ class StrangeeProfileViewModel(token: String, private val strangeeId: String) : 
     init {
         checkBlocked(token)
 
-        object : CountDownTimer(5000, 5000) {
+        timer = object : CountDownTimer(5000, 5000) {
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
                 addWhoCheckedMe(token)
             }
-        }.start()
+        }
+        timer.start()
+
+        SocketManager.getSocket()?.emit("subscribe", Gson().toJson(roomData))
+        SocketManager.getSocket()?.on("statusChange") {
+//            Log.i("MainActivitySocket", it[0].toString())
+
+            _isOnline.postValue(it[0].toString() == "online")
+        }
     }
 
     fun addWhoCheckedMe(token: String) {
@@ -166,6 +183,8 @@ class StrangeeProfileViewModel(token: String, private val strangeeId: String) : 
 
     override fun onCleared() {
         super.onCleared()
+        SocketManager.getSocket()?.emit("unsubscribe", Gson().toJson(roomData))
+        timer.cancel()
         viewModelJob.cancel()
     }
 }

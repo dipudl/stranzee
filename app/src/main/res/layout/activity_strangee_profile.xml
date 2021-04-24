@@ -5,10 +5,13 @@
     tools:context=".view.ProfileFragment">
 
     <data>
-
         <variable
             name="strangee"
             type="com.leminect.strangee.model.Strangee" />
+
+        <variable
+            name="strangeeProfileViewModel"
+            type="com.leminect.strangee.viewmodel.StrangeeProfileViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +53,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:contentDescription="@string/online_indicator"
-                        android:src="@drawable/ic_online"
+                        app:onlineOfflineIcon="@{strangeeProfileViewModel.isOnline}"
                         app:layout_constraintBottom_toBottomOf="@+id/profileCircleImageView"
                         app:layout_constraintStart_toStartOf="@+id/profileCircleImageView" />
                 </androidx.constraintlayout.widget.ConstraintLayout>

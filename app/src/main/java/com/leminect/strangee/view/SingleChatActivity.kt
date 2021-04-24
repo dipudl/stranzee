@@ -17,6 +17,7 @@ import com.leminect.strangee.databinding.SingleChatActionBarBinding
 import com.leminect.strangee.model.Message
 import com.leminect.strangee.model.SingleChatPerson
 import com.leminect.strangee.model.Strangee
+import com.leminect.strangee.network.SocketManager
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions
 
 class SingleChatActivity : AppCompatActivity() {
@@ -120,5 +121,15 @@ class SingleChatActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SocketManager.setOnline(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SocketManager.setOnline(false)
     }
 }

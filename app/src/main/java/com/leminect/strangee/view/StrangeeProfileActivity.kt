@@ -18,6 +18,7 @@ import com.leminect.strangee.databinding.ActivityStrangeeProfileBinding
 import com.leminect.strangee.model.SingleChatPerson
 import com.leminect.strangee.model.Strangee
 import com.leminect.strangee.model.User
+import com.leminect.strangee.network.SocketManager
 import com.leminect.strangee.utility.getFromSharedPreferences
 import com.leminect.strangee.viewmodel.SavedViewModel
 import com.leminect.strangee.viewmodel.StrangeeProfileStatus
@@ -49,9 +50,10 @@ class StrangeeProfileActivity : AppCompatActivity() {
         user = userData.second
         token = userData.first
 
-        val viewModelFactory = StrangeeProfileViewModelFactory(token, strangee.userId)
+        val viewModelFactory = StrangeeProfileViewModelFactory(token, user.userId, strangee.userId)
         viewModel =
             ViewModelProvider(this, viewModelFactory).get(StrangeeProfileViewModel::class.java)
+        binding.strangeeProfileViewModel = viewModel
 
         strangee.interestedIn.forEach { interest ->
             val chip =
@@ -255,5 +257,15 @@ class StrangeeProfileActivity : AppCompatActivity() {
             ?.setOnClickListener {
                 onBackPressed()
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SocketManager.setOnline(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SocketManager.setOnline(false)
     }
 }

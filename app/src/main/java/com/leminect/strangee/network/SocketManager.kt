@@ -1,0 +1,66 @@
+package com.leminect.strangee.network
+
+import android.util.Log
+import com.google.gson.Gson
+import io.socket.client.IO
+import io.socket.client.Socket
+
+data class Status(
+    var userId: String,
+    var status: String,
+    var token: String
+)
+
+data class RoomData(
+    val userId: String,
+    val roomName: String,
+    val purpose: String,
+    val token: String
+)
+
+object SocketManager {
+    private var mSocket: Socket? = null
+    private var UID: String = ""
+    private var token: String = ""
+    private val userStatus: Status = Status("", "", "")
+    val gson: Gson = Gson()
+
+    init {
+        try {
+            //This address is the way you can connect to localhost with AVD(Android Virtual Device)
+            mSocket = IO.socket(BASE_URL)
+            Log.d("success", mSocket?.id().toString())
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("fail", "Failed to connect")
+        }
+
+        mSocket?.connect()
+        //Register all the listener and callbacks here.
+//        mSocket.on(Socket.EVENT_CONNECT, onConnect)
+//        mSocket.on("sampleDataFromServer", onDataFromServer)
+    }
+
+    fun getSocket(): Socket? = mSocket
+
+    fun setUserId(id: String) {
+        UID = id
+        userStatus.userId = id
+    }
+
+    fun setToken(token: String) {
+        this.token = token
+        userStatus.token = token
+    }
+
+    fun setOnline(online: Boolean) {
+        if(online) {
+            userStatus.status = "online"
+        } else {
+            userStatus.status = "offline"
+        }
+
+        mSocket?.emit("status", gson.toJson(userStatus))
+    }
+}

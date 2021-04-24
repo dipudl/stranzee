@@ -17,6 +17,7 @@ import com.leminect.strangee.R
 import com.leminect.strangee.databinding.ActivityEditDetailsBinding
 import com.leminect.strangee.model.User
 import com.leminect.strangee.network.CheckRegistrationInput
+import com.leminect.strangee.network.SocketManager
 import com.leminect.strangee.utility.Constants
 import com.leminect.strangee.utility.emailCheck
 import com.leminect.strangee.utility.getFromSharedPreferences
@@ -341,5 +342,15 @@ class EditDetailsActivity : AppCompatActivity() {
         genderAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item)
         binding.countrySpinner.adapter = countryAdapter
         binding.genderSpinner.adapter = genderAdapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SocketManager.setOnline(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SocketManager.setOnline(false)
     }
 }

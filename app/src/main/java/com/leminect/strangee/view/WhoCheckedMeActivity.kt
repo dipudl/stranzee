@@ -17,6 +17,7 @@ import com.leminect.strangee.adapter.StrangeeClickListener
 import com.leminect.strangee.adapter.StrangeeGridAdapter
 import com.leminect.strangee.databinding.ActivityWhoCheckedMeBinding
 import com.leminect.strangee.model.Strangee
+import com.leminect.strangee.network.SocketManager
 import com.leminect.strangee.utility.getFromSharedPreferences
 import com.leminect.strangee.viewmodel.SavedStatus
 import com.leminect.strangee.viewmodel.SavedViewModel
@@ -136,5 +137,15 @@ class WhoCheckedMeActivity : AppCompatActivity() {
             ?.setOnClickListener {
                 onBackPressed()
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        SocketManager.setOnline(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SocketManager.setOnline(false)
     }
 }
