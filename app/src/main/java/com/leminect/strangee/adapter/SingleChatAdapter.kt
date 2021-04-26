@@ -13,14 +13,12 @@ import com.leminect.strangee.model.Message
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SingleChatAdapter(private val clickListener: ChatMessageClickListener) :
+class SingleChatAdapter(private val myUserId: String, private val clickListener: ChatMessageClickListener) :
     ListAdapter<Message, SingleChatAdapter.ChatMessageViewHolder>(ChatMessageDiffUtil()) {
-
-    val myUserId = "test"
 
     class ChatMessageDiffUtil : DiffUtil.ItemCallback<Message>() {
         override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem._id == newItem._id
         }
 
         override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {

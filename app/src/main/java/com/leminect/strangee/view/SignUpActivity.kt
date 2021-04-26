@@ -428,13 +428,13 @@ class SignUpActivity : AppCompatActivity() {
 
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
 
-            val imageUri: Uri = CropImage.getPickImageResultUriContent(this@SignUpActivity, data);
+            val imageUri: Uri = CropImage.getPickImageResultUriContent(this@SignUpActivity, data)
 
             if (CropImage.isReadExternalStoragePermissionsRequired(this@SignUpActivity,
                     imageUri)
             ) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0);
+                    requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
                 }
             } else {
                 CropImage.activity(imageUri)

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.leminect.strangee.R
+import com.leminect.strangee.model.ChatData
 import com.leminect.strangee.model.Message
 import com.leminect.strangee.model.Strangee
 import com.leminect.strangee.network.BASE_URL
@@ -157,6 +158,14 @@ fun chatImageBinding(textView: TextView, message: Message?, isVisible: Boolean?)
 fun bindRecyclerView(recyclerView: RecyclerView, data: List<Strangee>?) {
     data?.let {
         val adapter = recyclerView.adapter as StrangeeGridAdapter
+        adapter.submitList(data)
+    }
+}
+
+@BindingAdapter("chatListData")
+fun bindChatRecyclerView(recyclerView: RecyclerView, data: List<Message>?) {
+    data?.let {
+        val adapter = recyclerView.adapter as SingleChatAdapter
         adapter.submitList(data)
     }
 }

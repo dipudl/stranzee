@@ -7,6 +7,9 @@
         <variable
             name="chatPerson"
             type="com.leminect.strangee.model.SingleChatPerson" />
+        <variable
+            name="singleChatViewModel"
+            type="com.leminect.strangee.viewmodel.SingleChatViewModel" />
     </data>
 
     <LinearLayout
@@ -47,8 +50,8 @@
                 android:layout_height="10dp"
                 android:layout_margin="1dp"
                 android:contentDescription="@string/online_indicator"
-                android:src="@drawable/ic_online"
                 app:imageVisible="@{chatPerson.online}"
+                app:onlineOfflineIcon="@{singleChatViewModel.isOnline}"
                 app:layout_constraintBottom_toBottomOf="@+id/profileCircleImageView"
                 app:layout_constraintStart_toStartOf="@+id/profileCircleImageView" />
         </androidx.constraintlayout.widget.ConstraintLayout>

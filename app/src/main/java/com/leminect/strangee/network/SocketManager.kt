@@ -2,6 +2,7 @@ package com.leminect.strangee.network
 
 import android.util.Log
 import com.google.gson.Gson
+import com.leminect.strangee.model.Message
 import io.socket.client.IO
 import io.socket.client.Socket
 
@@ -13,9 +14,14 @@ data class Status(
 
 data class RoomData(
     val userId: String,
-    val roomName: String,
+    val strangeeId: String,
     val purpose: String,
     val token: String
+)
+
+data class MessageWithToken(
+    val token: String,
+    val message: Message
 )
 
 object SocketManager {
