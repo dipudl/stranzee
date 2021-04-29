@@ -13,7 +13,10 @@ import com.leminect.strangee.model.Message
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SingleChatAdapter(private val myUserId: String, private val clickListener: ChatMessageClickListener) :
+class SingleChatAdapter(
+    private val myUserId: String,
+    private val clickListener: ChatMessageClickListener,
+) :
     ListAdapter<Message, SingleChatAdapter.ChatMessageViewHolder>(ChatMessageDiffUtil()) {
 
     class ChatMessageDiffUtil : DiffUtil.ItemCallback<Message>() {
@@ -53,7 +56,7 @@ class SingleChatAdapter(private val myUserId: String, private val clickListener:
             var timeDiff: Long = 600000
             previousItem?.let {
                 timeDiff = item.timestamp - previousItem.timestamp
-                if(timeDiff < 600000 && previousItem.userId == item.userId) {
+                if (timeDiff < 600000 && previousItem.userId == item.userId) {
                     binding.messageSeparation.visibility = View.GONE
                 }
             }

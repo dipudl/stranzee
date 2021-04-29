@@ -1,6 +1,7 @@
 package com.leminect.strangee.view
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -10,12 +11,15 @@ import android.os.CountDownTimer
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.leminect.strangee.R
 import com.leminect.strangee.adapter.ChatMessageClickListener
 import com.leminect.strangee.adapter.SingleChatAdapter
@@ -23,13 +27,18 @@ import com.leminect.strangee.databinding.ActivitySingleChatBinding
 import com.leminect.strangee.databinding.SingleChatActionBarBinding
 import com.leminect.strangee.model.Message
 import com.leminect.strangee.model.SingleChatPerson
+import com.leminect.strangee.model.Strangee
 import com.leminect.strangee.model.User
 import com.leminect.strangee.network.SocketManager
 import com.leminect.strangee.utility.FetchPath
 import com.leminect.strangee.utility.getFromSharedPreferences
+import com.leminect.strangee.utility.hideKeyboard
+import com.leminect.strangee.viewmodel.ChatStatus
+import com.leminect.strangee.viewmodel.MessageLoad
 import com.leminect.strangee.viewmodel.SingleChatViewModel
 import com.leminect.strangee.viewmodelfactory.SingleChatViewModelFactory
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions
+import java.lang.Exception
 
 
 class SingleChatActivity : AppCompatActivity() {
@@ -39,9 +48,22 @@ class SingleChatActivity : AppCompatActivity() {
     private lateinit var viewModel: SingleChatViewModel
     private lateinit var user: User
     private lateinit var token: String
+    private var isKeyboardHidden: Boolean = true
     private val PICK_IMAGE_REQUEST = 1012
     private val PERMISSIONS_REQUEST = 1023
     private val mimeTypes = arrayOf("image/jpeg", "image/jpg", "image/png")
+
+    companion object {
+        var currentActivity: Activity? = null
+        fun finishActivity() {
+            try {
+                currentActivity?.finish()
+                currentActivity = null
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -50,7 +72,7 @@ class SingleChatActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == PERMISSIONS_REQUEST) {
+        if (requestCode == PERMISSIONS_REQUEST) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -66,6 +88,8 @@ class SingleChatActivity : AppCompatActivity() {
         binding = ActivitySingleChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        currentActivity = this
+
         singleChatPerson = intent.getSerializableExtra("chat_person") as SingleChatPerson
         val userData = getFromSharedPreferences(this)
         user = userData.second
@@ -78,31 +102,103 @@ class SingleChatActivity : AppCompatActivity() {
         setUpActionBar()
 
         val adapter = SingleChatAdapter(user.userId, ChatMessageClickListener { message ->
-            Toast.makeText(this@SingleChatActivity, message.type, Toast.LENGTH_SHORT).show()
+            if (message.type == "image") {
+                startActivity(Intent(this, ImageShowActivity::class.java).putExtra("image",
+                    message.imageUrl))
+            }
         })
 
         binding.chatMessageRecyclerView.adapter = adapter
 
         viewModel.messageList.observe(this, Observer { messageList ->
-            adapter.submitList(messageList)
-            if (viewModel.initialOldMessageLoad.value == true) {
-                binding.chatMessageRecyclerView.scrollToPosition(messageList.size - 1)
-                viewModel.onInitialOldMessageLoadComplete()
-            }
+            if (messageList.isNotEmpty()) {
+                adapter.submitList(messageList)
+                if (viewModel.initialOldMessageLoad.value == true) {
+                    binding.chatMessageRecyclerView.scrollToPosition(messageList.size - 1)
+                    viewModel.onInitialOldMessageLoadComplete()
+                }
 
-            if (messageList[messageList.size - 1].userId == user.userId) {
+                if (viewModel.fetchedMessageIsNew.value == true && viewModel.scrollToNewMessage.value == true) {
+                    object : CountDownTimer(200, 200) {
+                        override fun onTick(millisUntilFinished: Long) {
+                        }
 
-                object : CountDownTimer(200, 200) {
-                    override fun onTick(millisUntilFinished: Long) {
-                    }
+                        override fun onFinish() {
+                            binding.chatMessageRecyclerView.scrollToPosition(messageList.size - 1)
+                        }
 
-                    override fun onFinish() {
-                        binding.chatMessageRecyclerView.scrollToPosition(messageList.size - 1)
-                    }
-
-                }.start()
+                    }.start()
+                }
             }
         })
+
+        binding.reloadButton.setOnClickListener {
+            viewModel.getOlderMessages(true)
+        }
+
+        viewModel.messageLoadStatus.observe(this, Observer { status ->
+            status?.let {
+                if ((viewModel.messageList.value?.size ?: 0) == 0) {
+                    when (status) {
+                        MessageLoad.LOADING -> {
+                            binding.reloadButton.visibility = View.GONE
+                            binding.statusAnimation.apply {
+                                setAnimation(R.raw.chats_loading_anim)
+                                visibility = View.VISIBLE
+                                if (!this.isAnimating) this.playAnimation()
+                            }
+                            binding.errorTextView.visibility = View.GONE
+                        }
+                        MessageLoad.LOADING_ERROR -> {
+                            binding.reloadButton.visibility = View.VISIBLE
+                            binding.statusAnimation.apply {
+                                setAnimation(R.raw.internet_error_anim)
+                                visibility = View.VISIBLE
+                                if (!this.isAnimating) this.playAnimation()
+                            }
+                            binding.errorTextView.text =
+                                getString(R.string.error_loading_messages)
+                            binding.errorTextView.visibility = View.VISIBLE
+                        }
+                        MessageLoad.LOADING_FAILED -> {
+                            binding.reloadButton.visibility = View.VISIBLE
+                            binding.statusAnimation.apply {
+                                setAnimation(R.raw.internet_error_anim)
+                                visibility = View.VISIBLE
+                                if (!this.isAnimating) this.playAnimation()
+                            }
+                            binding.errorTextView.text =
+                                getString(R.string.failed_loading_messages)
+                            binding.errorTextView.visibility = View.VISIBLE
+                        }
+                        MessageLoad.EMPTY -> {
+                            binding.reloadButton.visibility = View.GONE
+                            binding.statusAnimation.apply {
+                                setAnimation(R.raw.no_results_found)
+                                visibility = View.VISIBLE
+                                if (!this.isAnimating) this.playAnimation()
+                            }
+                            binding.errorTextView.text =
+                                getString(R.string.no_messages, singleChatPerson.firstName)
+                            binding.errorTextView.visibility = View.VISIBLE
+                        }
+                        MessageLoad.LOADING_DONE -> {
+                            binding.reloadButton.visibility = View.GONE
+                            binding.statusAnimation.visibility = View.GONE
+                            binding.errorTextView.visibility = View.GONE
+                        }
+                    }
+                } else {
+                    binding.reloadButton.visibility = View.GONE
+                    binding.statusAnimation.visibility = View.GONE
+                    binding.errorTextView.visibility = View.GONE
+                }
+            }
+        })
+
+        if (binding.messageInput.hasFocus()) {
+            binding.messageInput.clearFocus()
+        }
 
         emojIconActions = EmojIconActions(applicationContext,
             binding.root,
@@ -171,23 +267,59 @@ class SingleChatActivity : AppCompatActivity() {
             binding.messageInput.setText("")
         }
 
-        /*binding.chatMessageRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.chatMessageRecyclerView.addOnScrollListener(object :
+            RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (viewModel.scrollPaginationEnabled.value == true) {
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                    if (layoutManager != null) {
-                        val totalItemCount = layoutManager.itemCount
-                        val firstVisible = layoutManager.findFirstVisibleItemPosition()
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager?
+                if (layoutManager != null) {
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisible = layoutManager.findFirstVisibleItemPosition()
+
+                    if (layoutManager.findLastVisibleItemPosition() + 5 >= totalItemCount) {
+                        viewModel.setScrollToNewMessage(true)
+                    } else {
+                        viewModel.setScrollToNewMessage(false)
+                    }
+
+                    if (viewModel.scrollPaginationEnabled.value == true) {
                         val startHasBeenReached = (firstVisible - 5) <= 0
 
                         if ((totalItemCount > 0) && startHasBeenReached) {
                             //you have reached to the start of recycler view, load previous messages
-                            viewModel.getStrangeeList(token, user, false)
+                            viewModel.getOlderMessages()
                         }
                     }
                 }
             }
-        })*/
+        })
+
+        binding.mainLayout.viewTreeObserver.addOnGlobalLayoutListener {
+            val heightDiff: Int = binding.mainLayout.rootView.height - binding.mainLayout.height
+            Log.i("SingleChatActivityKeybo", "Height diff: $heightDiff")
+            if (heightDiff > 500) {
+                //keyboard is open
+                Log.i("SingleChatActivityKeybo", "Keyboard open")
+                if (isKeyboardHidden) {
+                    isKeyboardHidden = false
+                    viewModel.messageList.value?.let {
+                        if (it.isNotEmpty())
+                            binding.chatMessageRecyclerView.scrollToPosition(it.size - 1)
+                    }
+                }
+                if (!binding.messageInput.hasFocus()) {
+                    binding.messageInput.requestFocus()
+                }
+            } else {
+                //keyboard is hidden
+                isKeyboardHidden = true
+
+                Log.i("SingleChatActivityKeybo", "Keyboard hidden")
+                if (binding.messageInput.hasFocus()) {
+                    binding.messageInput.clearFocus()
+                }
+            }
+        }
     }
 
     private fun pickImage() {
@@ -207,10 +339,11 @@ class SingleChatActivity : AppCompatActivity() {
                 val imagePath: String? = FetchPath.getPath(this, imageUri)
 
                 // use imagePath to upload image
-                if(imagePath != null) {
+                if (imagePath != null) {
                     viewModel.uploadImage(imagePath)
                 } else {
-                    Toast.makeText(this, "Failed to upload image. Try again!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Failed to upload image. Try again!", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -240,12 +373,34 @@ class SingleChatActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.show_profile -> Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show()
-            R.id.single_chat_block -> Toast.makeText(this, "Blocked", Toast.LENGTH_SHORT).show()
-            R.id.single_chat_report -> Toast.makeText(this, "Reported", Toast.LENGTH_SHORT).show()
+            R.id.show_profile -> {
+                StrangeeProfileActivity.finishActivity()
+                goToStrangeeProfile()
+            }
+            // R.id.single_chat_block -> Toast.makeText(this, "Blocked", Toast.LENGTH_SHORT).show()
+            // R.id.single_chat_report -> Toast.makeText(this, "Reported", Toast.LENGTH_SHORT).show()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    private fun goToStrangeeProfile() {
+        val strangee: Strangee = Strangee(
+            singleChatPerson.userId,
+            singleChatPerson.firstName,
+            singleChatPerson.lastName,
+            singleChatPerson.imageUrl,
+            singleChatPerson.country,
+            singleChatPerson.gender,
+            singleChatPerson.interestedIn,
+            singleChatPerson.birthday,
+            singleChatPerson.aboutMe,
+            singleChatPerson.saved
+        )
+
+        val intent: Intent = Intent(this, StrangeeProfileActivity::class.java)
+        intent.putExtra("strangee_data", strangee)
+        startActivity(intent)
     }
 
     override fun onResume() {

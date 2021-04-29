@@ -1,26 +1,24 @@
 package com.leminect.strangee.adapter
 
-import android.util.Log
+import android.graphics.Typeface
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.leminect.strangee.R
-import com.leminect.strangee.model.ChatData
 import com.leminect.strangee.model.Message
 import com.leminect.strangee.model.Strangee
 import com.leminect.strangee.network.BASE_URL
-import com.leminect.strangee.network.StrangeeBackData
-import com.leminect.strangee.viewmodel.FindStatus
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 @BindingAdapter("detailText")
 fun bindDetailText(textView: TextView, data: Strangee?) {
@@ -44,6 +42,28 @@ fun bindFormattedName(
             "$firstName ${if (lastName.isNotEmpty()) lastName[0] else ""}."
         }
         textView.text = shortName
+    }
+}
+
+@BindingAdapter("showAsBoldAndRegular")
+fun bindShowAsBoldAndRegular(textView: TextView, bold: Boolean?) {
+    bold?.let {
+        textView.typeface = if (bold) {
+            ResourcesCompat.getFont(textView.context, R.font.poppins_semibold)
+        } else {
+            ResourcesCompat.getFont(textView.context, R.font.poppins)
+        }
+    }
+}
+
+@BindingAdapter("showAsBoldAndLight")
+fun bindShowAsBoldAndLight(textView: TextView, bold: Boolean?) {
+    bold?.let {
+        textView.typeface = if (bold) {
+            ResourcesCompat.getFont(textView.context, R.font.poppins_semibold)
+        } else {
+            ResourcesCompat.getFont(textView.context, R.font.poppins_light)
+        }
     }
 }
 
@@ -76,8 +96,11 @@ fun bindImageUrl(imageView: View, imageUrl: String?, userId: String? = null) {
         userId?.let {
             if (url.contains(userId)) {
                 val context = imageView.context
-                val key = context.getSharedPreferences(context.getString(R.string.shared_prefs_name),
-                    AppCompatActivity.MODE_PRIVATE).getString(context.getString(R.string.prefs_signature), System.currentTimeMillis().toString())
+                val key =
+                    context.getSharedPreferences(context.getString(R.string.shared_prefs_name),
+                        AppCompatActivity.MODE_PRIVATE)
+                        .getString(context.getString(R.string.prefs_signature),
+                            System.currentTimeMillis().toString())
                 glide.signature(ObjectKey(key!!))
             }
         }

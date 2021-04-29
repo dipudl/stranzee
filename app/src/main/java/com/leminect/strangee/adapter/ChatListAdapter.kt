@@ -11,7 +11,7 @@ import com.leminect.strangee.model.ChatData
 class ChatListAdapter(private val clickListener: ChatListClickListener): ListAdapter<ChatData, ChatListAdapter.ChatListViewHolder>(ChatListDiffUtil()) {
     class ChatListDiffUtil: DiffUtil.ItemCallback<ChatData>() {
         override fun areItemsTheSame(oldItem: ChatData, newItem: ChatData): Boolean {
-            return oldItem.userId == newItem.userId
+            return oldItem.strangeeId == newItem.strangeeId
         }
 
         override fun areContentsTheSame(oldItem: ChatData, newItem: ChatData): Boolean {

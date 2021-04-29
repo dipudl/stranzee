@@ -1,5 +1,6 @@
 package com.leminect.strangee.view
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,6 +26,7 @@ import com.leminect.strangee.viewmodel.StrangeeProfileStatus
 import com.leminect.strangee.viewmodel.StrangeeProfileViewModel
 import com.leminect.strangee.viewmodelfactory.SavedViewModelFactory
 import com.leminect.strangee.viewmodelfactory.StrangeeProfileViewModelFactory
+import java.lang.Exception
 
 class StrangeeProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStrangeeProfileBinding
@@ -37,6 +39,18 @@ class StrangeeProfileActivity : AppCompatActivity() {
     private lateinit var token: String
     private var menu: Menu? = null
 
+    companion object {
+        var currentActivity: Activity? = null
+        fun finishActivity() {
+            try {
+                currentActivity?.finish()
+                currentActivity = null
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpActionBar()
@@ -45,6 +59,8 @@ class StrangeeProfileActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         strangee = intent.getSerializableExtra("strangee_data") as Strangee
         binding.strangee = strangee
+
+        currentActivity = this
 
         val userData = getFromSharedPreferences(this)
         user = userData.second
@@ -98,7 +114,8 @@ class StrangeeProfileActivity : AppCompatActivity() {
                 if (saveStrangeeBackData.error) {
                     strangee.saved = saveStrangeeBackData.saveStatus
                     binding.invalidateAll()
-                    menu?.findItem(R.id.profile_save)?.title = if(strangee.saved) "Unsave profile" else "Save profile"
+                    menu?.findItem(R.id.profile_save)?.title =
+                        if (strangee.saved) "Unsave profile" else "Save profile"
                     Toast.makeText(this,
                         "Failed to ${if (saveStrangeeBackData.saveStatus) "unsave" else "save"} profile",
                         Toast.LENGTH_SHORT).show()
@@ -108,7 +125,7 @@ class StrangeeProfileActivity : AppCompatActivity() {
 
         viewModel.blockedBackData.observe(this, Observer { blocked ->
             blocked?.let {
-                if(blocked) {
+                if (blocked) {
                     menu?.findItem(R.id.profile_block)?.title = "Unblock"
                 } else {
                     menu?.findItem(R.id.profile_block)?.title = "Block"
@@ -118,7 +135,7 @@ class StrangeeProfileActivity : AppCompatActivity() {
 
         viewModel.status.observe(this, Observer { status ->
             status?.let {
-                when(status) {
+                when (status) {
                     StrangeeProfileStatus.ERROR -> {
                         viewModel.onPopupComplete()
                         loadingDialog.dismissDialog()
@@ -140,11 +157,15 @@ class StrangeeProfileActivity : AppCompatActivity() {
 
         viewModel.blockingProcessBackData.observe(this, Observer { data ->
             data?.let {
-                if(data.error) {
+                if (data.error) {
 //                    menu?.findItem(R.id.profile_block)?.title = if(data.blockedStatus) "Unblock" else "Block"
-                    Toast.makeText(this, "Failed to ${if(data.blockedStatus) "unblock" else "block"}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,
+                        "Failed to ${if (data.blockedStatus) "unblock" else "block"}",
+                        Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(this, if(data.blockedStatus) "Blocked" else "Unblocked", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,
+                        if (data.blockedStatus) "Blocked" else "Unblocked",
+                        Toast.LENGTH_LONG).show()
                 }
             }
         })
@@ -160,7 +181,8 @@ class StrangeeProfileActivity : AppCompatActivity() {
 
     private fun saveOrUnsaveProfile() {
         val s = strangee.copy()
-        menu?.findItem(R.id.profile_save)?.title = if(strangee.saved) "Save profile" else "Unsave profile"
+        menu?.findItem(R.id.profile_save)?.title =
+            if (strangee.saved) "Save profile" else "Unsave profile"
         strangee.saved = !strangee.saved
         binding.invalidateAll()
 
@@ -168,13 +190,20 @@ class StrangeeProfileActivity : AppCompatActivity() {
     }
 
     private fun startChatActivity() {
+        SingleChatActivity.finishActivity()
+
         val intent: Intent = Intent(this, SingleChatActivity::class.java)
-        // TODO: put exact value of isOnline
         val chatPerson = SingleChatPerson(strangee.userId,
             strangee.firstName,
             strangee.lastName,
             strangee.imageUrl,
-            true)
+            viewModel.isOnline.value?: false,
+            strangee.country,
+            strangee.gender,
+            strangee.interestedIn,
+            strangee.birthday,
+            strangee.aboutMe,
+            strangee.saved)
         intent.putExtra("chat_person", chatPerson)
         startActivity(intent)
     }
@@ -182,8 +211,10 @@ class StrangeeProfileActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         this.menu = menu
         menuInflater.inflate(R.menu.strangee_profile_menu, menu)
-        menu?.findItem(R.id.profile_save)?.title = if(strangee.saved) "Unsave profile" else "Save profile"
-        if(viewModel.blockedBackData.value == true) menu?.findItem(R.id.profile_block)?.title = "Unblock"
+        menu?.findItem(R.id.profile_save)?.title =
+            if (strangee.saved) "Unsave profile" else "Save profile"
+        if (viewModel.blockedBackData.value == true) menu?.findItem(R.id.profile_block)?.title =
+            "Unblock"
         return true
     }
 
@@ -192,7 +223,7 @@ class StrangeeProfileActivity : AppCompatActivity() {
             R.id.profile_chat -> startChatActivity()
             R.id.profile_save -> saveOrUnsaveProfile()
             R.id.profile_block -> {
-                if(viewModel.blockedBackData.value == true) {
+                if (viewModel.blockedBackData.value == true) {
                     viewModel.blockUser(token)
                 } else {
                     HybridDialog(
@@ -231,7 +262,9 @@ class StrangeeProfileActivity : AppCompatActivity() {
                             dismissDialog: (Boolean) -> Unit,
                         ) {
                             if (interests.isBlank()) {
-                                Toast.makeText(this@StrangeeProfileActivity, "Please enter the message", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this@StrangeeProfileActivity,
+                                    "Please enter the message",
+                                    Toast.LENGTH_LONG).show()
                                 dismissDialog(false)
                             } else {
                                 dismissDialog(true)

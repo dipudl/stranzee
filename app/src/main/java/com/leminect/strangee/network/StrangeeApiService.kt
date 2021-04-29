@@ -1,5 +1,7 @@
 package com.leminect.strangee.network
 
+import com.leminect.strangee.model.ChatData
+import com.leminect.strangee.model.Message
 import com.leminect.strangee.model.Strangee
 import com.leminect.strangee.model.User
 import com.squareup.moshi.Json
@@ -11,7 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
-public const val BASE_URL = "http://192.168.4.2:3000/"
+public const val BASE_URL = "http://192.168.1.155:3000/"
 // "http://192.168.1.101:3000/" // "http://10.0.2.2:3000/" // "http://192.168.1.101:3000/"
 
 private val moshi: Moshi = Moshi.Builder()
@@ -126,6 +128,20 @@ interface StrangeeApiService {
         @Header("Authorization") token: String,
         @Query("_id") userId: String,
     ): List<Strangee>
+
+    @GET("message")
+    suspend fun getMessage(
+        @Header("Authorization") token: String,
+        @Query("userId") userId: String,
+        @Query("strangeeId") strangeeId: String,
+        @Query("lastCreatedAt") createdAt: String,
+        ): List<Message>
+
+    @GET("chat")
+    suspend fun getChat(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+    ): List<ChatData>
 
     @POST("removeSaved")
     suspend fun removeSavedProfile(

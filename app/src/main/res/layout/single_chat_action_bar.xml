@@ -43,14 +43,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/placeholder_profile_pic" />
+                android:src="@drawable/loading_image" />
 
             <ImageView
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:layout_margin="1dp"
                 android:contentDescription="@string/online_indicator"
-                app:imageVisible="@{chatPerson.online}"
                 app:onlineOfflineIcon="@{singleChatViewModel.isOnline}"
                 app:layout_constraintBottom_toBottomOf="@+id/profileCircleImageView"
                 app:layout_constraintStart_toStartOf="@+id/profileCircleImageView" />

@@ -7,5 +7,11 @@ data class SingleChatPerson(
     val firstName: String,
     val lastName: String,
     val imageUrl: String,
-    var isOnline: Boolean
+    val isOnline: Boolean,
+    val country: String,
+    val gender: String,
+    val interestedIn: List<String>,
+    val birthday: Long,
+    val aboutMe: String,
+    var saved: Boolean,
 ) : Serializable

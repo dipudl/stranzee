@@ -7,5 +7,6 @@ data class Message(
     val type: String,
     val imageUrl: String?,
     val timestamp: Long,
-    val _id: String?
+    val _id: String?,
+    val createdAt: String? = null
 )

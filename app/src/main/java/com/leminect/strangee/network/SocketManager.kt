@@ -9,19 +9,26 @@ import io.socket.client.Socket
 data class Status(
     var userId: String,
     var status: String,
-    var token: String
+    var token: String,
 )
 
 data class RoomData(
     val userId: String,
     val strangeeId: String,
     val purpose: String,
-    val token: String
+    val token: String,
 )
 
 data class MessageWithToken(
     val token: String,
-    val message: Message
+    val message: Message,
+)
+
+data class MessagePagination(
+    val token: String,
+    val userId: String,
+    val strangeeId: String,
+    var lastCreatedAt: String,
 )
 
 object SocketManager {
@@ -32,6 +39,10 @@ object SocketManager {
     val gson: Gson = Gson()
 
     init {
+        setupSocket()
+    }
+
+    private fun setupSocket() {
         try {
             //This address is the way you can connect to localhost with AVD(Android Virtual Device)
             mSocket = IO.socket(BASE_URL)
@@ -51,6 +62,9 @@ object SocketManager {
     fun getSocket(): Socket? = mSocket
 
     fun setUserId(id: String) {
+        if(mSocket?.connected() != true) {
+            setupSocket()
+        }
         UID = id
         userStatus.userId = id
     }
@@ -61,7 +75,7 @@ object SocketManager {
     }
 
     fun setOnline(online: Boolean) {
-        if(online) {
+        if (online) {
             userStatus.status = "online"
         } else {
             userStatus.status = "offline"
