@@ -29,6 +29,14 @@ data class AuthBackData(
     val message: String,
     val data: User,
     val token: String,
+    val refreshToken: String,
+)
+
+data class TokenCheck(
+    val authorized: Boolean,
+    val restartOnTokenChange: Boolean,
+    val token: String,
+    val refreshToken: String,
 )
 
 data class LoginDetail(
@@ -129,13 +137,18 @@ interface StrangeeApiService {
         @Query("_id") userId: String,
     ): List<Strangee>
 
+    @POST("tokenCheck")
+    suspend fun postTokenCheck(
+        @Body tokenCheckData: TokenCheck,
+    ): TokenCheck
+
     @GET("message")
     suspend fun getMessage(
         @Header("Authorization") token: String,
         @Query("userId") userId: String,
         @Query("strangeeId") strangeeId: String,
         @Query("lastCreatedAt") createdAt: String,
-        ): List<Message>
+    ): List<Message>
 
     @GET("chat")
     suspend fun getChat(
@@ -153,6 +166,12 @@ interface StrangeeApiService {
     suspend fun getIsBlocked(
         @Header("Authorization") token: String,
         @Query("_id") userId: String,
+    ): Boolean
+
+    @GET("amIBlocked")
+    suspend fun getAmIBlocked(
+        @Header("Authorization") token: String,
+        @Query("strangeeId") strangeeId: String,
     ): Boolean
 
     @POST("block")

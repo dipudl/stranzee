@@ -327,6 +327,7 @@
     <string name="minimum_password_length">6</string>
     <string name="shared_prefs_name">com.leminect.strangee</string>
     <string name="prefs_token">token</string>
+    <string name="prefs_refresh_token">refresh token</string>
     <string name="prefs_user_id">userId</string>
     <string name="prefs_firstName">firstName</string>
     <string name="prefs_lastName">lastName</string>
@@ -356,6 +357,7 @@
     <string name="failed_loading_saved">Failed to load saved profiles</string>
     <string name="failed_loading_chat_list">Failed to load chats</string>
     <string name="failed_loading_messages">Failed to load messages</string>
+    <string name="blocked_message">You have been blocked by this user.</string>
     <string name="nobody_visited">Nobody visited your profile</string>
     <string name="failed_to_load_profiles">Failed to load the profiles</string>
     <string name="error_loading_profiles">Error loading profiles. Please check your internet connection.</string>
@@ -363,6 +365,7 @@
     <string name="full_screen_image">Full screen image</string>
     <string name="back_button">back button</string>
     <string name="glide_image_error">An error occurred.\nTry again!</string>
+    <string name="uploading_image">Uploading image...</string>
 
     <bool name="_true">true</bool>
     <bool name="_false">false</bool>

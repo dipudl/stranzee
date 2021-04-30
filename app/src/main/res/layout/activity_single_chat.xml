@@ -60,8 +60,42 @@
         android:clipToPadding="false"
         android:paddingBottom="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/chat_input"
+        app:layout_constraintBottom_toTopOf="@id/imageUploadingLayout"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/imageUploadingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="6dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/chat_input"
+        app:layout_constraintStart_toStartOf="@id/chat_input"
+        android:background="@drawable/image_uploading_background">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            app:lottie_rawRes="@raw/loading_block_anim"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/main_blue"
+            android:fontFamily="@font/poppins"
+            android:text="@string/uploading_image"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/chat_input"

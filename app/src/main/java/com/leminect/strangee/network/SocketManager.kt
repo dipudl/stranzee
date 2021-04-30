@@ -31,6 +31,12 @@ data class MessagePagination(
     var lastCreatedAt: String,
 )
 
+data class BlockStatus(
+    val blockedBy: String,
+    val blockedUser: String,
+    val status: String,
+)
+
 object SocketManager {
     private var mSocket: Socket? = null
     private var UID: String = ""
@@ -62,7 +68,7 @@ object SocketManager {
     fun getSocket(): Socket? = mSocket
 
     fun setUserId(id: String) {
-        if(mSocket?.connected() != true) {
+        if (mSocket?.connected() != true) {
             setupSocket()
         }
         UID = id

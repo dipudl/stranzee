@@ -44,6 +44,10 @@ class SingleChatViewModel(
     val isOnline: LiveData<Boolean>
         get() = _isOnline
 
+    private val _isBlocked = MutableLiveData<Boolean>()
+    val isBlocked: LiveData<Boolean>
+        get() = _isBlocked
+
     private val _messageList = MutableLiveData<List<Message>>()
     val messageList: LiveData<List<Message>>
         get() = _messageList
@@ -75,7 +79,35 @@ class SingleChatViewModel(
     private val viewModelJob = Job()
 
     init {
-        setupSockets()
+        checkBlocked()
+    }
+
+    fun checkBlocked() {
+
+        viewModelScope.launch {
+            try {
+                Log.i("SProfileViewModel", "Checking blocked...")
+                _messageLoadStatus.value = MessageLoad.LOADING
+
+                val blocked =
+                    StrangeeApi.retrofitService.getAmIBlocked("Bearer ".plus(token), strangeeId)
+                Log.i("SingleChatViewModel", "Blocked: $blocked")
+
+                if(!blocked) {
+                    setupSockets()
+                } else {
+                    _messageLoadStatus.value = null
+                }
+
+                _isBlocked.value = blocked
+            } catch (t: ConnectException) {
+                Log.i("SingleChatViewModel", "BLOCKING_Error ::: $t")
+                _messageLoadStatus.value = MessageLoad.LOADING_ERROR
+            } catch (t: Throwable) {
+                Log.i("SingleChatViewModel", "BLOCKING_Failed ::: $t")
+                _messageLoadStatus.value = MessageLoad.LOADING_FAILED
+            }
+        }
     }
 
     private fun setupSockets() {
@@ -89,13 +121,24 @@ class SingleChatViewModel(
         getOlderMessages(true)
         SocketManager.getSocket()?.on("new message") {
             _fetchedMessageIsNew.postValue(true)
-            _messageLoadStatus.postValue(MessageLoad.LOADING_DONE)
+
+            if(_isBlocked.value != true) {
+                _messageLoadStatus.postValue(MessageLoad.LOADING_DONE)
+            }
 
             _messageList.postValue((_messageList.value
                 ?: listOf<Message>()) + (gson.fromJson(it[0].toString(),
                 Array<Message>::class.java)) as Array<Message>)
 
             postMessageRead()
+        }
+
+        SocketManager.getSocket()?.on("blockStatusChange") {
+            val blockStatus: BlockStatus = gson.fromJson(it[0].toString(), BlockStatus::class.java)
+
+            if(blockStatus.blockedUser == userId) {
+                _isBlocked.postValue(blockStatus.status == "blocked")
+            }
         }
     }
 
@@ -188,6 +231,10 @@ class SingleChatViewModel(
                 _status.value = SingleChatStatus.UPLOAD_FAILED
             }
         }
+    }
+
+    fun clearUploadStatus() {
+        _status.value = null
     }
 
     override fun onCleared() {

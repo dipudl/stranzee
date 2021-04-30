@@ -108,7 +108,7 @@ class EditDetailsActivity : AppCompatActivity() {
                     EditDetailsStatus.UPDATE_DONE -> {
                         loadingDialog.dismissDialog()
                         Toast.makeText(this, "Profile details updated", Toast.LENGTH_LONG).show()
-                        saveUserToSharedPrefs(this, newUser, token, false)
+                        saveUserToSharedPrefs(this, newUser, token, null,false)
                         finish()
                     }
                     EditDetailsStatus.UPDATE_FAILED -> {

@@ -119,7 +119,10 @@ class SignUpActivity : AppCompatActivity() {
                 loadingDialog.dismissDialog()
 
                 // store user data & token then move to next activity
-                saveUserToSharedPrefs(this, signUpBackData.data, signUpBackData.token)
+                saveUserToSharedPrefs(this,
+                    signUpBackData.data,
+                    signUpBackData.token,
+                    signUpBackData.refreshToken)
 
                 hideKeyboard()
                 accountCreatedDialog.showDialog()
@@ -234,7 +237,7 @@ class SignUpActivity : AppCompatActivity() {
                     password
                 )
 
-                if(viewModel.status.value != SignUpStatus.CHECKING || viewModel.status.value != SignUpStatus.SIGNING_UP) {
+                if (viewModel.status.value != SignUpStatus.CHECKING || viewModel.status.value != SignUpStatus.SIGNING_UP) {
                     viewModel.checkAndSignUpUser(CheckRegistrationInput(email), user)
                 }
             }

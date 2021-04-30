@@ -13,6 +13,8 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.*
@@ -20,15 +22,20 @@ import com.leminect.strangee.R
 import com.leminect.strangee.adapter.bindImageUrl
 import com.leminect.strangee.databinding.ActivityMainBinding
 import com.leminect.strangee.network.SocketManager
+import com.leminect.strangee.viewmodel.MainViewModel
+import com.leminect.strangee.viewmodelfactory.MainViewModelFactory
 import de.hdodenhof.circleimageview.CircleImageView
 import io.socket.emitter.Emitter
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var drawerLayout: DrawerLayout
     lateinit var navController: NavController
     lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var viewModel: MainViewModel
+    private lateinit var token: String
+    private lateinit var refreshToken: String
+    private lateinit var userId: String
     private lateinit var prefs: SharedPreferences
     private lateinit var headerTextView: TextView
     private lateinit var headerImageView: CircleImageView
@@ -38,8 +45,45 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         prefs = getSharedPreferences(getString(R.string.shared_prefs_name), MODE_PRIVATE)
-        SocketManager.setUserId(prefs.getString(getString(R.string.prefs_user_id), "")!!)
-        SocketManager.setToken(prefs.getString(getString(R.string.prefs_token), "")!!)
+        userId = prefs.getString(getString(R.string.prefs_user_id), "")!!
+        token = prefs.getString(getString(R.string.prefs_token), "")!!
+        refreshToken = prefs.getString(getString(R.string.prefs_refresh_token), "")!!
+
+        val viewModelFactory = MainViewModelFactory(token, refreshToken, userId)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
+        viewModel.tokenCheckData.observe(this, Observer { data ->
+            data?.let {
+                viewModel.onTokenDataChecked()
+
+                if (data.authorized) {
+                    if (data.token != token) {
+                        prefs.edit().putString(getString(R.string.prefs_token), data.token).commit()
+                        prefs.edit().putString(getString(R.string.prefs_refresh_token), data.refreshToken).commit()
+
+                        if(data.restartOnTokenChange) {
+                            Toast.makeText(this,
+                                "Session expired. Restarting app...",
+                                Toast.LENGTH_SHORT).show()
+
+                            // restart the app
+                            val intent = Intent(this, SplashScreen::class.java)
+                            finishAffinity()
+                            this.startActivity(intent)
+                        }
+                    }
+                } else {
+                    prefs.edit().clear().commit()
+                    Toast.makeText(this,
+                        "Session expired. Please login to continue.",
+                        Toast.LENGTH_LONG).show()
+                    goToLoginActivity()
+                }
+            }
+        })
+
+        SocketManager.setUserId(userId)
+        SocketManager.setToken(token)
 
         drawerLayout = binding.drawerLayout
         val navHeaderView = binding.navView.getHeaderView(0)
@@ -197,16 +241,6 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration)
     }
-
-    /*override fun onStart() {
-        SocketManager.setOnline(true)
-        super.onStart()
-    }
-
-    override fun onStop() {
-        SocketManager.setOnline(false)
-        super.onStop()
-    }*/
 
     override fun onResume() {
         super.onResume()

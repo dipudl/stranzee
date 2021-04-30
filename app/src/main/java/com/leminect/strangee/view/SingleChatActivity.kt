@@ -35,6 +35,7 @@ import com.leminect.strangee.utility.getFromSharedPreferences
 import com.leminect.strangee.utility.hideKeyboard
 import com.leminect.strangee.viewmodel.ChatStatus
 import com.leminect.strangee.viewmodel.MessageLoad
+import com.leminect.strangee.viewmodel.SingleChatStatus
 import com.leminect.strangee.viewmodel.SingleChatViewModel
 import com.leminect.strangee.viewmodelfactory.SingleChatViewModelFactory
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions
@@ -110,6 +111,28 @@ class SingleChatActivity : AppCompatActivity() {
 
         binding.chatMessageRecyclerView.adapter = adapter
 
+        viewModel.isBlocked.observe(this, Observer { blocked ->
+            blocked?.let {
+                if(blocked) {
+                    binding.statusAnimation.apply {
+                        setAnimation(R.raw.blocked_anim)
+                        visibility = View.VISIBLE
+                        if (!this.isAnimating) this.playAnimation()
+                    }
+                    binding.errorTextView.text =
+                        getString(R.string.blocked_message)
+                    binding.errorTextView.visibility = View.VISIBLE
+                    binding.chatMessageRecyclerView.visibility = View.GONE
+                } else {
+                    binding.statusAnimation.visibility = View.GONE
+                    binding.errorTextView.visibility = View.GONE
+                    binding.chatMessageRecyclerView.visibility = View.VISIBLE
+                }
+
+                binding.reloadButton.visibility = View.GONE
+            }
+        })
+
         viewModel.messageList.observe(this, Observer { messageList ->
             if (messageList.isNotEmpty()) {
                 adapter.submitList(messageList)
@@ -133,7 +156,7 @@ class SingleChatActivity : AppCompatActivity() {
         })
 
         binding.reloadButton.setOnClickListener {
-            viewModel.getOlderMessages(true)
+            viewModel.checkBlocked()
         }
 
         viewModel.messageLoadStatus.observe(this, Observer { status ->
@@ -218,6 +241,25 @@ class SingleChatActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.status.observe(this, Observer { status ->
+            status?.let {
+                when(status) {
+                    SingleChatStatus.UPLOADING -> {
+                        binding.imageUploadingLayout.visibility = View.VISIBLE
+                    }
+                    SingleChatStatus.UPLOAD_FAILED, SingleChatStatus.UPLOAD_ERROR -> {
+                        Toast.makeText(this, "Failed to upload image. Try again!", Toast.LENGTH_LONG).show()
+                        binding.imageUploadingLayout.visibility = View.GONE
+                        viewModel.clearUploadStatus()
+                    }
+                    SingleChatStatus.UPLOAD_DONE -> {
+                        binding.imageUploadingLayout.visibility = View.GONE
+                        viewModel.clearUploadStatus()
+                    }
+                }
+            }
+        })
+
         viewModel.imageUploadUrl.observe(this, Observer { imageUrl ->
             imageUrl?.let {
                 val message = Message(user.userId,
@@ -251,20 +293,28 @@ class SingleChatActivity : AppCompatActivity() {
         }
 
         binding.sendMessageButton.setOnClickListener {
-            val text = binding.messageInput.text.toString()
-
-            if (text.trim().isNotEmpty()) {
-                val message = Message(user.userId,
-                    singleChatPerson.userId,
-                    text,
-                    "text",
-                    null,
-                    System.currentTimeMillis(),
-                    System.currentTimeMillis().toString())
-                viewModel.sendMessage(message)
+            when (viewModel.isBlocked.value) {
+                false -> {
+                    val text = binding.messageInput.text.toString()
+                    if (text.trim().isNotEmpty()) {
+                        val message = Message(user.userId,
+                            singleChatPerson.userId,
+                            text,
+                            "text",
+                            null,
+                            System.currentTimeMillis(),
+                            System.currentTimeMillis().toString())
+                        viewModel.sendMessage(message)
+                    }
+                    binding.messageInput.setText("")
+                }
+                true -> {
+                    Toast.makeText(this, "Cannot send message because this user has blocked you.", Toast.LENGTH_LONG).show()
+                }
+                else -> {
+                    Toast.makeText(this, "Loading messages. Please wait...", Toast.LENGTH_LONG).show()
+                }
             }
-
-            binding.messageInput.setText("")
         }
 
         binding.chatMessageRecyclerView.addOnScrollListener(object :
@@ -323,11 +373,25 @@ class SingleChatActivity : AppCompatActivity() {
     }
 
     private fun pickImage() {
-        val imageIntent = Intent()
-            .setType("image/*")
-            .setAction(Intent.ACTION_GET_CONTENT)
-            .putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-        startActivityForResult(imageIntent, PICK_IMAGE_REQUEST)
+        when (viewModel.isBlocked.value) {
+            false -> {
+                if(viewModel.status.value != SingleChatStatus.UPLOADING) {
+                    val imageIntent = Intent()
+                        .setType("image/*")
+                        .setAction(Intent.ACTION_GET_CONTENT)
+                        .putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+                    startActivityForResult(imageIntent, PICK_IMAGE_REQUEST)
+                } else {
+                    Toast.makeText(this, "Uploading previous image. Please wait...", Toast.LENGTH_LONG).show()
+                }
+            }
+            true -> {
+                Toast.makeText(this, "Cannot send image because this user has blocked you.", Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                Toast.makeText(this, "Loading messages. Please wait...", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

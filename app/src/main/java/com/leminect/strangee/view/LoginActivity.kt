@@ -12,6 +12,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -97,7 +98,10 @@ class LoginActivity : AppCompatActivity() {
                 loadingDialog.dismissDialog()
 
                 // store user data & token then move to next activity
-                saveUserToSharedPrefs(this, returnedData.data, returnedData.token)
+                saveUserToSharedPrefs(this,
+                    returnedData.data,
+                    returnedData.token,
+                    returnedData.refreshToken)
                 hideKeyboard()
                 goToNextActivity()
             }
@@ -137,6 +141,35 @@ class LoginActivity : AppCompatActivity() {
         binding.signUpButton.setOnClickListener {
             val intent: Intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
+        }
+
+        binding.forgotPassword.setOnClickListener{
+            HybridDialog(
+                this,
+                arrayOf(View.VISIBLE, View.VISIBLE, View.VISIBLE, View.GONE, View.VISIBLE),
+                arrayOf("Forgot Password?",
+                    "Please enter your email address to get verification code required for changing the password",
+                    "Email",
+                    ""),
+                false,
+                object : OkButtonListener {
+                    override fun onOkClick(
+                        interests: String,
+                        dismissDialog: (Boolean) -> Unit,
+                    ) {
+                        if (emailCheck(interests)) {
+                            dismissDialog(true)
+
+                            // show verification code input screen
+
+
+                        } else {
+                            Toast.makeText(this@LoginActivity, "Please enter valid email", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
+                "Send"
+            ).showDialog()
         }
     }
 

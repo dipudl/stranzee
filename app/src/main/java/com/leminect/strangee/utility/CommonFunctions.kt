@@ -2,16 +2,11 @@ package com.leminect.strangee.utility
 
 import android.app.Activity
 import android.content.Context
-import android.database.Cursor
-import android.net.Uri
-import android.provider.MediaStore
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import androidx.loader.content.CursorLoader
 import com.leminect.strangee.R
 import com.leminect.strangee.model.User
 import java.io.File
@@ -43,7 +38,7 @@ fun emailCheck(email: String): Boolean {
     return email.matches(regex)
 }
 
-fun saveUserToSharedPrefs(context: Context, user: User, token: String, refreshProfileImageSignature: Boolean = true) {
+fun saveUserToSharedPrefs(context: Context, user: User, token: String, refreshToken: String?, refreshProfileImageSignature: Boolean = true) {
     val prefsEditor =
         context.getSharedPreferences(context.getString(R.string.shared_prefs_name),
             AppCompatActivity.MODE_PRIVATE).edit()
@@ -65,6 +60,10 @@ fun saveUserToSharedPrefs(context: Context, user: User, token: String, refreshPr
     prefsEditor.putString(context.getString(R.string.prefs_email), user.email)
     prefsEditor.putString(context.getString(R.string.prefs_interested_in),
         user.interestedIn.joinToString(separator = ","))
+
+    refreshToken?.let {
+        prefsEditor.putString(context.getString(R.string.prefs_refresh_token), refreshToken)
+    }
 
     if(refreshProfileImageSignature) {
         prefsEditor.putString(context.getString(R.string.prefs_signature),

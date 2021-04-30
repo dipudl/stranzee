@@ -111,6 +111,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
+                android:id="@+id/forgot_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -119,6 +120,7 @@
                 android:layout_marginBottom="24dp"
                 android:fontFamily="@font/poppins_light"
                 android:text="@string/forgot_password"
+                android:background="?attr/selectableItemBackground"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
