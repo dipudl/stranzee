@@ -19,6 +19,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.leminect.strangee.R
 import com.leminect.strangee.databinding.ActivityLoginBinding
+import com.leminect.strangee.network.BASE_URL
 import com.leminect.strangee.utility.emailCheck
 import com.leminect.strangee.utility.hideKeyboard
 import com.leminect.strangee.utility.saveUserToSharedPrefs
@@ -56,9 +57,9 @@ class LoginActivity : AppCompatActivity() {
 
         val ss: SpannableString = SpannableString(getString(R.string.agree_terms_and_policy))
 
-        ss.setSpan(InnerTextClick(getString(R.string.terms_of_service_link)),
+        ss.setSpan(InnerTextClick(BASE_URL + getString(R.string.terms_of_service_link)),
             31, 47, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        ss.setSpan(InnerTextClick(getString(R.string.privacy_policy_link)),
+        ss.setSpan(InnerTextClick(BASE_URL + getString(R.string.privacy_policy_link)),
             52, 66, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
 
         binding.termsAndPolicyText.text = ss
@@ -144,32 +145,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.forgotPassword.setOnClickListener{
-            HybridDialog(
-                this,
-                arrayOf(View.VISIBLE, View.VISIBLE, View.VISIBLE, View.GONE, View.VISIBLE),
-                arrayOf("Forgot Password?",
-                    "Please enter your email address to get verification code required for changing the password",
-                    "Email",
-                    ""),
-                false,
-                object : OkButtonListener {
-                    override fun onOkClick(
-                        interests: String,
-                        dismissDialog: (Boolean) -> Unit,
-                    ) {
-                        if (emailCheck(interests)) {
-                            dismissDialog(true)
-
-                            // show verification code input screen
-
-
-                        } else {
-                            Toast.makeText(this@LoginActivity, "Please enter valid email", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                },
-                "Send"
-            ).showDialog()
+            val forgotPasswordIntent: Intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(forgotPasswordIntent)
         }
     }
 
@@ -182,7 +159,7 @@ class LoginActivity : AppCompatActivity() {
     inner class InnerTextClick(val link: String) : ClickableSpan() {
         override fun onClick(widget: View) {
             val browserIntent = Intent(Intent.ACTION_VIEW)
-            browserIntent.data = Uri.parse(getString(R.string.terms_of_service_link))
+            browserIntent.data = Uri.parse(link)
             startActivity(browserIntent)
         }
 

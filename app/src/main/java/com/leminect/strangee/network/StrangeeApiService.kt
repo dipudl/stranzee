@@ -74,6 +74,11 @@ data class SaveStrangeePostData(
     val currentSavedStatus: Boolean,
 )
 
+data class ForgotPasswordReturn(
+    val userFound: Boolean,
+    val emailSent: Boolean,
+)
+
 interface StrangeeApiService {
     @Multipart
     @POST("signup")
@@ -110,6 +115,9 @@ interface StrangeeApiService {
 
     @POST("login")
     suspend fun postLogin(@Body detail: LoginDetail): AuthBackData
+
+    @POST("forgotPassword")
+    suspend fun postForgotPassword(@Query("email") email: String): ForgotPasswordReturn
 
     @GET("strangee")
     suspend fun getStrangee(

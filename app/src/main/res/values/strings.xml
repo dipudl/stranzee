@@ -10,8 +10,8 @@
     <string name="password_hint">Password</string>
     <string name="decoration_for_logo">decoration for logo</string>
 
-    <string name="terms_of_service_link">https://www.example.com</string>
-    <string name="privacy_policy_link">https://www.example.com</string>
+    <string name="terms_of_service_link">terms_of_service</string>
+    <string name="privacy_policy_link">privacy_policy</string>
     <string name="sign_up_action_bar_text">Join Strangee</string>
     <string name="go_back">Go back</string>
     <string name="upload_profile_picture">Upload profile picture</string>
@@ -308,6 +308,7 @@
     <string name="apply">Apply</string>
     <string name="save_details">Save Details</string>
     <string name="edit_details_actionbar">Edit Details</string>
+    <string name="forgot_password_actionbar">Forgot password?</string>
     <string name="online_indicator">online indicator</string>
     <string name="current_age">Current Age</string>
     <string name="save_profile">Save profile</string>
@@ -366,6 +367,7 @@
     <string name="back_button">back button</string>
     <string name="glide_image_error">An error occurred.\nTry again!</string>
     <string name="uploading_image">Uploading image...</string>
+    <string name="forgot_password_top_text">Please enter your email address to get the password reset link</string>
 
     <bool name="_true">true</bool>
     <bool name="_false">false</bool>
