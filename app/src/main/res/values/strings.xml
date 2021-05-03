@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Strangee</string>
-    <string name="name_of_app">STRANGEE</string>
+    <string name="app_name">Stranzee</string>
+    <string name="name_of_app">STRANZEE</string>
     <string name="agree_terms_and_policy">By continuing you agree to the Terms of Service and Privacy Policy</string>
     <string name="create_an_account">Create an Account</string>
     <string name="or">OR</string>
@@ -12,7 +12,7 @@
 
     <string name="terms_of_service_link">terms_of_service</string>
     <string name="privacy_policy_link">privacy_policy</string>
-    <string name="sign_up_action_bar_text">Join Strangee</string>
+    <string name="sign_up_action_bar_text">Join Stranzee</string>
     <string name="go_back">Go back</string>
     <string name="upload_profile_picture">Upload profile picture</string>
     <string name="first_name">First name</string>
@@ -290,7 +290,7 @@
     <string name="rate_us">Rate us</string>
     <string name="share">Share</string>
     <string name="slider_menu">slider menu</string>
-    <string name="strangee">STRANGEE</string>
+    <string name="strangee">STRANZEE</string>
     <string name="chat_capital">CHAT</string>
     <string name="saved_capital">SAVED</string>
     <string name="profile_capital">PROFILE</string>
@@ -347,7 +347,7 @@
     <string name="no_profile_found">No profile found for current filter.</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
-    <string name="contact_us_text">For any questions or concerns please email us at leminect@gmail.com</string>
+    <string name="contact_us_text">For any questions or concerns please email us at mail@example.com</string>
     <string name="share_text">Hey, Join me on %s, a free and amazing app for meeting with strangers &amp; making new friends. \n\n Play Store link: https://play.google.com/store/apps/details?id=%s</string>
     <string name="no_profile_saved">No profile saved</string>
     <string name="no_chats">No conversation yet</string>

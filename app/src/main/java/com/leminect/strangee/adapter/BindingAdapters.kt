@@ -86,7 +86,7 @@ fun bindTimestamp(textView: TextView, timestamp: Long?) {
 @BindingAdapter("imgUrl", "userId", requireAll = false)
 fun bindImageUrl(imageView: View, imageUrl: String?, userId: String? = null) {
     imageUrl?.let { url ->
-        val imgUri = (BASE_URL + url).toUri().buildUpon().scheme("http").build()
+        val imgUri = (BASE_URL + url).toUri().buildUpon().scheme("https").build()
         val glide = Glide.with(imageView.context)
             .load(imgUri)
             .apply(RequestOptions()

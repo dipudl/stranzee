@@ -33,7 +33,7 @@ class ImageShowActivity : AppCompatActivity() {
 
         if(imageUrl != null && imageUrl != "") {
             imageUrl?.let { url ->
-                val imgUri = (BASE_URL + url).toUri().buildUpon().scheme("http").build()
+                val imgUri = (BASE_URL + url).toUri().buildUpon().scheme("https").build()
                 Glide.with(this)
                     .load(imgUri)
                     .listener(object : RequestListener<Drawable> {
