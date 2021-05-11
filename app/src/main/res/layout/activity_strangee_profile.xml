@@ -7,11 +7,11 @@
     <data>
         <variable
             name="strangee"
-            type="com.leminect.strangee.model.Strangee" />
+            type="com.leminect.stranzee.model.Strangee" />
 
         <variable
             name="strangeeProfileViewModel"
-            type="com.leminect.strangee.viewmodel.StrangeeProfileViewModel" />
+            type="com.leminect.stranzee.viewmodel.StrangeeProfileViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

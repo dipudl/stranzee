@@ -6,7 +6,7 @@
     <data>
         <variable
             name="strangee"
-            type="com.leminect.strangee.model.Strangee" />
+            type="com.leminect.stranzee.model.Strangee" />
 
         <variable
             name="showCross"
@@ -14,7 +14,7 @@
 
         <variable
             name="clickListener"
-            type="com.leminect.strangee.adapter.StrangeeClickListener" />
+            type="com.leminect.stranzee.adapter.StrangeeClickListener" />
     </data>
 
     <LinearLayout

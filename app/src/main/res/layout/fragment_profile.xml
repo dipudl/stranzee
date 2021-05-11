@@ -8,7 +8,7 @@
 
         <variable
             name="user"
-            type="com.leminect.strangee.model.User" />
+            type="com.leminect.stranzee.model.User" />
     </data>
 
     <androidx.core.widget.NestedScrollView

@@ -326,7 +326,7 @@
     <string name="im_interested_in">I\'m interested in</string>
 
     <string name="minimum_password_length">6</string>
-    <string name="shared_prefs_name">com.leminect.strangee</string>
+    <string name="shared_prefs_name">com.leminect.stranzee</string>
     <string name="prefs_token">token</string>
     <string name="prefs_refresh_token">refresh token</string>
     <string name="prefs_user_id">userId</string>

@@ -5,18 +5,18 @@
 
     <fragment
         android:id="@+id/findFragment"
-        android:name="com.leminect.strangee.view.FindFragment"
+        android:name="com.leminect.stranzee.view.FindFragment"
         android:label="Find" />
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.leminect.strangee.view.ChatFragment"
+        android:name="com.leminect.stranzee.view.ChatFragment"
         android:label="ChatFragment" />
     <fragment
         android:id="@+id/savedFragment"
-        android:name="com.leminect.strangee.view.SavedFragment"
+        android:name="com.leminect.stranzee.view.SavedFragment"
         android:label="Saved" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.leminect.strangee.view.ProfileFragment"
+        android:name="com.leminect.stranzee.view.ProfileFragment"
         android:label="Profile" />
 </navigation>

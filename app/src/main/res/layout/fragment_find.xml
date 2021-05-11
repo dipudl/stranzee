@@ -6,7 +6,7 @@
     <data>
         <variable
             name="findViewModel"
-            type="com.leminect.strangee.viewmodel.FindViewModel" />
+            type="com.leminect.stranzee.viewmodel.FindViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

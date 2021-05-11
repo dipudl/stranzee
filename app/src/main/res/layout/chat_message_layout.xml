@@ -6,11 +6,11 @@
     <data>
         <variable
             name="message"
-            type="com.leminect.strangee.model.Message" />
+            type="com.leminect.stranzee.model.Message" />
 
         <variable
             name="clickListener"
-            type="com.leminect.strangee.adapter.ChatMessageClickListener" />
+            type="com.leminect.stranzee.adapter.ChatMessageClickListener" />
 
         <variable
             name="amISender"

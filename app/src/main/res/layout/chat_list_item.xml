@@ -6,11 +6,11 @@
     <data>
         <variable
             name="chatData"
-            type="com.leminect.strangee.model.ChatData" />
+            type="com.leminect.stranzee.model.ChatData" />
 
         <variable
             name="clickListener"
-            type="com.leminect.strangee.adapter.ChatListClickListener" />
+            type="com.leminect.stranzee.adapter.ChatListClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -6,10 +6,10 @@
     <data>
         <variable
             name="chatPerson"
-            type="com.leminect.strangee.model.SingleChatPerson" />
+            type="com.leminect.stranzee.model.SingleChatPerson" />
         <variable
             name="singleChatViewModel"
-            type="com.leminect.strangee.viewmodel.SingleChatViewModel" />
+            type="com.leminect.stranzee.viewmodel.SingleChatViewModel" />
     </data>
 
     <LinearLayout
