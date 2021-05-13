@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
-                    android:background="@android:color/transparent"
+                    android:background="?attr/colorPrimary"
                     android:elevation="0dp" />
 
             </com.google.android.material.appbar.AppBarLayout>

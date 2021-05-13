@@ -5,13 +5,13 @@
     "kind": "Directory"
   },
   "applicationId": "com.leminect.stranzee",
-  "variantName": "processReleaseResources",
+  "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
-      "versionCode": 1,
-      "versionName": "0.9",
+      "versionCode": 2,
+      "versionName": "0.9.1",
       "outputFile": "app-release.apk"
     }
   ]
