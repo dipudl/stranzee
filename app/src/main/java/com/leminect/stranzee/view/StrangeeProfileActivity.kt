@@ -69,6 +69,9 @@ class StrangeeProfileActivity : AppCompatActivity() {
             ViewModelProvider(this, viewModelFactory).get(StrangeeProfileViewModel::class.java)
         binding.strangeeProfileViewModel = viewModel
 
+        binding.aboutMe.visibility = if(strangee.aboutMe == "-") View.GONE else View.VISIBLE
+        binding.aboutMeTitleText.visibility = if(strangee.aboutMe == "-") View.GONE else View.VISIBLE
+
         strangee.interestedIn.forEach { interest ->
             val chip =
                 layoutInflater.inflate(R.layout.interest_chip_item, binding.interestsChipGroup,

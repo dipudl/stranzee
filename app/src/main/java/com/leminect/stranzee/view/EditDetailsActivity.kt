@@ -60,7 +60,9 @@ class EditDetailsActivity : AppCompatActivity() {
 
         binding.textInputFirstName.editText?.setText(user.firstName)
         binding.textInputLastName.editText?.setText(user.lastName)
-        binding.textInputAboutMe.editText?.setText(user.aboutMe)
+        binding.textInputAboutMe.editText?.setText(
+            if(user.aboutMe == "-") "" else user.aboutMe
+        )
         binding.birthdayText.text = user.formatTime()
         binding.countrySpinner.setSelection(Constants.getCountries().indexOf(user.country))
         binding.genderSpinner.setSelection(Constants.getGenders().indexOf(user.gender))
@@ -154,11 +156,11 @@ class EditDetailsActivity : AppCompatActivity() {
             } else if (birthday == null) {
                 Toast.makeText(this, "Please select your birthday", Toast.LENGTH_LONG).show()
 
-            } else if (aboutMe.trim().isEmpty() || aboutMe.length < 50) {
+            } else if (aboutMe.trim().isEmpty() || aboutMe.length < 30) {
                 Toast.makeText(this,
-                    "'About me' must contain 50 or more characters",
+                    "'About me' must contain 30 or more characters",
                     Toast.LENGTH_LONG).show()
-                binding.textInputAboutMe.error = "Minimum 50 characters required"
+                binding.textInputAboutMe.error = "Minimum 30 characters required"
 
             } else {
                 newUser = user.copy(
@@ -306,8 +308,8 @@ class EditDetailsActivity : AppCompatActivity() {
                 binding.textInputLastName.error = null
         }
         binding.textInputAboutMe.editText?.doOnTextChanged { text, _, _, count ->
-            if (text.toString().length < 50 && errorEnabled)
-                binding.textInputAboutMe.error = "Minimum 50 characters required"
+            if (text.toString().length < 30 && errorEnabled)
+                binding.textInputAboutMe.error = "Minimum 30 characters required"
             else
                 binding.textInputAboutMe.error = null
         }

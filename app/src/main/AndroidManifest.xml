@@ -22,20 +22,44 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Strangee">
-        <activity android:name="com.leminect.stranzee.view.ForgotPasswordActivity"/>
+        <activity
+            android:name="com.leminect.stranzee.view.ForgotPasswordActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.leminect.stranzee.view.ImageShowActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
-        <activity android:name="com.leminect.stranzee.view.SingleChatActivity" />
-        <activity android:name="com.leminect.stranzee.view.StrangeeProfileActivity" />
-        <activity android:name="com.leminect.stranzee.view.EditDetailsActivity" />
-        <activity android:name="com.leminect.stranzee.view.WhoCheckedMeActivity" />
-        <activity android:name="com.leminect.stranzee.view.SignUpActivity" />
+        <activity
+            android:name="com.leminect.stranzee.view.SingleChatActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.leminect.stranzee.view.StrangeeProfileActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.leminect.stranzee.view.EditDetailsActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.leminect.stranzee.view.WhoCheckedMeActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.leminect.stranzee.view.SignUpActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.leminect.stranzee.view.LoginActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/LoginScreenTheme" />
         <activity
             android:name="com.leminect.stranzee.view.SplashScreen"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +69,9 @@
         </activity>
         <activity
             android:name="com.leminect.stranzee.view.MainActivity"
+            android:configChanges="orientation"
             android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
             android:theme="@style/MainActivityTheme" />
         <!--
 <activity
@@ -54,7 +80,13 @@
         -->
         <activity
             android:name="com.canhub.cropper.CropImageActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Strangee" />
+
+        <service
+            android:name="com.leminect.stranzee.network.NotificationService"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"

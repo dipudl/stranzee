@@ -163,6 +163,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
+                android:layout_marginBottom="18dp"
                 android:background="@drawable/round_blue_button_background"
                 android:fontFamily="@font/poppins"
                 android:paddingStart="12dp"
@@ -174,12 +175,11 @@
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
-            <com.google.android.material.textfield.TextInputLayout
+            <!--<com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_about_me"
                 style="@style/Widget.App.SignUpTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
                 app:counterEnabled="true"
                 app:counterMaxLength="150"
                 app:errorEnabled="true">
@@ -194,14 +194,14 @@
                     android:textColor="@color/sign_up_page_black_text"
                     android:textSize="17sp" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>-->
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_email"
                 style="@style/Widget.App.SignUpTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:errorEnabled="true">
+                app:errorEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -219,6 +219,7 @@
                 style="@style/Widget.App.SignUpTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 app:errorEnabled="true"
                 app:passwordToggleEnabled="true">
 
@@ -233,7 +234,7 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+            <!--<com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_re_enter_password"
                 style="@style/Widget.App.SignUpTextInputLayout"
                 android:layout_width="match_parent"
@@ -250,7 +251,7 @@
                     android:textColor="@color/sign_up_page_black_text"
                     android:textSize="17sp" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>-->
 
             <Button
                 android:id="@+id/create_account_button"

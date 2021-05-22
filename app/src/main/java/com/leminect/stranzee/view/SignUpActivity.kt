@@ -49,7 +49,6 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var userExistsHybridDialog: HybridDialog
     private lateinit var loadingDialog: CustomLoadingDialog
     private lateinit var accountCreatedDialog: CustomLoadingDialog
-    private lateinit var prefsEditor: SharedPreferences.Editor
 
     private val viewModel: SignUpViewModel by lazy {
         ViewModelProvider(this).get(SignUpViewModel::class.java)
@@ -164,10 +163,10 @@ class SignUpActivity : AppCompatActivity() {
             val lastName = binding.textInputLastName.editText?.text.toString()
             val country = binding.countrySpinner.selectedItem.toString()
             val gender = binding.genderSpinner.selectedItem.toString()
-            val aboutMe = binding.textInputAboutMe.editText?.text.toString()
+            // val aboutMe = binding.textInputAboutMe.editText?.text.toString()
             val email = binding.textInputEmail.editText?.text.toString()
             val password = binding.textInputPassword.editText?.text.toString()
-            val rePassword = binding.textInputReEnterPassword.editText?.text.toString()
+            // val rePassword = binding.textInputReEnterPassword.editText?.text.toString()
 
             errorEnabled = true
 
@@ -197,13 +196,13 @@ class SignUpActivity : AppCompatActivity() {
             } else if (birthday == null) {
                 Toast.makeText(this, "Please select your birthday", Toast.LENGTH_LONG).show()
 
-            } else if (aboutMe.trim().isEmpty() || aboutMe.length < 50) {
+            } /*else if (aboutMe.trim().isEmpty() || aboutMe.length < 30) {
                 Toast.makeText(this,
-                    "'About me' must contain 50 or more characters",
+                    "'About me' must contain 30 or more characters",
                     Toast.LENGTH_LONG).show()
-                binding.textInputAboutMe.error = "Minimum 50 characters required"
+                binding.textInputAboutMe.error = "Minimum 30 characters required"
 
-            } else if (!emailCheck(email)) {
+            }*/ else if (!emailCheck(email)) {
                 Toast.makeText(this, "Please enter correct email address", Toast.LENGTH_LONG).show()
                 binding.textInputEmail.error = "Invalid email"
 
@@ -214,11 +213,11 @@ class SignUpActivity : AppCompatActivity() {
                 binding.textInputPassword.error =
                     "Minimum ${getString(R.string.minimum_password_length).toInt()} characters required"
 
-            } else if (password != rePassword) {
+            } /*else if (password != rePassword) {
                 Toast.makeText(this, "Both passwords must be same", Toast.LENGTH_LONG).show()
                 binding.textInputReEnterPassword.error = "Passwords must match"
 
-            } else {
+            }*/ else {
                 user = User(
                     firstName,
                     lastName,
@@ -227,7 +226,7 @@ class SignUpActivity : AppCompatActivity() {
                     gender,
                     interestList.toList(),
                     birthday!!,
-                    aboutMe,
+                    /*aboutMe*/ "-",
                     email,
                     password
                 )
@@ -256,17 +255,20 @@ class SignUpActivity : AppCompatActivity() {
             else
                 binding.textInputLastName.error = null
         }
-        binding.textInputAboutMe.editText?.doOnTextChanged { text, _, _, count ->
-            if (text.toString().length < 50 && errorEnabled)
-                binding.textInputAboutMe.error = "Minimum 50 characters required"
+        /*binding.textInputAboutMe.editText?.doOnTextChanged { text, _, _, count ->
+            if (text.toString().length < 30 && errorEnabled)
+                binding.textInputAboutMe.error = "Minimum 30 characters required"
             else
                 binding.textInputAboutMe.error = null
-        }
+        }*/
         binding.textInputEmail.editText?.doOnTextChanged { text, _, _, count ->
-            if (!emailCheck(text.toString()) && errorEnabled)
+            if (!emailCheck(text.toString()) && errorEnabled) {
+                binding.textInputEmail.isErrorEnabled = true
                 binding.textInputEmail.error = "Invalid email"
-            else
+            } else {
                 binding.textInputEmail.error = null
+                binding.textInputEmail.isErrorEnabled = false
+            }
         }
         binding.textInputPassword.editText?.doOnTextChanged { text, _, _, count ->
             if (text.toString().length < 6 && errorEnabled)
@@ -275,12 +277,12 @@ class SignUpActivity : AppCompatActivity() {
             else
                 binding.textInputPassword.error = null
         }
-        binding.textInputReEnterPassword.editText?.doOnTextChanged { text, _, _, count ->
+        /*binding.textInputReEnterPassword.editText?.doOnTextChanged { text, _, _, count ->
             if (text.toString() != binding.textInputPassword.editText?.text.toString() && errorEnabled)
                 binding.textInputReEnterPassword.error = "Passwords must match"
             else
                 binding.textInputReEnterPassword.error = null
-        }
+        }*/
 
     }
 

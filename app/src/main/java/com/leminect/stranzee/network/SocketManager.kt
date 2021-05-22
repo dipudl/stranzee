@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.leminect.stranzee.model.Message
 import io.socket.client.IO
 import io.socket.client.Socket
+import io.socket.emitter.Emitter
 
 data class Status(
     var userId: String,
@@ -61,8 +62,8 @@ object SocketManager {
 
         mSocket?.connect()
         //Register all the listener and callbacks here.
-//        mSocket.on(Socket.EVENT_CONNECT, onConnect)
-//        mSocket.on("sampleDataFromServer", onDataFromServer)
+        //mSocket.on(Socket.EVENT_CONNECT, onConnect)
+        //mSocket.on("sampleDataFromServer", onDataFromServer)
     }
 
     fun getSocket(): Socket? = mSocket

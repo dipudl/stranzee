@@ -21,8 +21,10 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/bottom_card_view"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/bottom_card_view">
+            app:layout_constraintVertical_bias="1.0"
+            tools:layout_editor_absoluteX="-163dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -53,9 +55,9 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:contentDescription="@string/online_indicator"
-                        app:onlineOfflineIcon="@{strangeeProfileViewModel.isOnline}"
                         app:layout_constraintBottom_toBottomOf="@+id/profileCircleImageView"
-                        app:layout_constraintStart_toStartOf="@+id/profileCircleImageView" />
+                        app:layout_constraintStart_toStartOf="@+id/profileCircleImageView"
+                        app:onlineOfflineIcon="@{strangeeProfileViewModel.isOnline}" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
@@ -85,6 +87,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/aboutMeTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
@@ -94,6 +97,7 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/aboutMe"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"

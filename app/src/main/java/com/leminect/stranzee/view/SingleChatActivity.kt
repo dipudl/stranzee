@@ -3,6 +3,7 @@ package com.leminect.stranzee.view
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -47,6 +48,7 @@ class SingleChatActivity : AppCompatActivity() {
     private lateinit var viewModel: SingleChatViewModel
     private lateinit var user: User
     private lateinit var token: String
+    private lateinit var prefs: SharedPreferences
     private var isKeyboardHidden: Boolean = true
     private val PICK_IMAGE_REQUEST = 1012
     private val PERMISSIONS_REQUEST = 1023
@@ -88,6 +90,7 @@ class SingleChatActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         currentActivity = this
+        prefs = getSharedPreferences(getString(R.string.shared_prefs_name), MODE_PRIVATE)
 
         singleChatPerson = intent.getSerializableExtra("chat_person") as SingleChatPerson
         val userData = getFromSharedPreferences(this)
@@ -111,7 +114,7 @@ class SingleChatActivity : AppCompatActivity() {
 
         viewModel.isBlocked.observe(this, Observer { blocked ->
             blocked?.let {
-                if(blocked) {
+                if (blocked) {
                     binding.statusAnimation.apply {
                         setAnimation(R.raw.blocked_anim)
                         visibility = View.VISIBLE
@@ -241,12 +244,14 @@ class SingleChatActivity : AppCompatActivity() {
 
         viewModel.status.observe(this, Observer { status ->
             status?.let {
-                when(status) {
+                when (status) {
                     SingleChatStatus.UPLOADING -> {
                         binding.imageUploadingLayout.visibility = View.VISIBLE
                     }
                     SingleChatStatus.UPLOAD_FAILED, SingleChatStatus.UPLOAD_ERROR -> {
-                        Toast.makeText(this, "Failed to upload image. Try again!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this,
+                            "Failed to upload image. Try again!",
+                            Toast.LENGTH_LONG).show()
                         binding.imageUploadingLayout.visibility = View.GONE
                         viewModel.clearUploadStatus()
                     }
@@ -307,10 +312,13 @@ class SingleChatActivity : AppCompatActivity() {
                     binding.messageInput.setText("")
                 }
                 true -> {
-                    Toast.makeText(this, "Cannot send message because this user has blocked you.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,
+                        "Cannot send message because this user has blocked you.",
+                        Toast.LENGTH_LONG).show()
                 }
                 else -> {
-                    Toast.makeText(this, "Loading messages. Please wait...", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Loading messages. Please wait...", Toast.LENGTH_LONG)
+                        .show()
                 }
             }
         }
@@ -373,18 +381,22 @@ class SingleChatActivity : AppCompatActivity() {
     private fun pickImage() {
         when (viewModel.isBlocked.value) {
             false -> {
-                if(viewModel.status.value != SingleChatStatus.UPLOADING) {
+                if (viewModel.status.value != SingleChatStatus.UPLOADING) {
                     val imageIntent = Intent()
                         .setType("image/*")
                         .setAction(Intent.ACTION_GET_CONTENT)
                         .putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
                     startActivityForResult(imageIntent, PICK_IMAGE_REQUEST)
                 } else {
-                    Toast.makeText(this, "Uploading previous image. Please wait...", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this,
+                        "Uploading previous image. Please wait...",
+                        Toast.LENGTH_LONG).show()
                 }
             }
             true -> {
-                Toast.makeText(this, "Cannot send image because this user has blocked you.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this,
+                    "Cannot send image because this user has blocked you.",
+                    Toast.LENGTH_LONG).show()
             }
             else -> {
                 Toast.makeText(this, "Loading messages. Please wait...", Toast.LENGTH_LONG).show()
@@ -463,6 +475,20 @@ class SingleChatActivity : AppCompatActivity() {
         val intent: Intent = Intent(this, StrangeeProfileActivity::class.java)
         intent.putExtra("strangee_data", strangee)
         startActivity(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        prefs.edit()
+            .putString(getString(R.string.prefs_current_chat_user_id), singleChatPerson.userId)
+            .commit()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        prefs.edit()
+            .putString(getString(R.string.prefs_current_chat_user_id), null)
+            .commit()
     }
 
     override fun onResume() {

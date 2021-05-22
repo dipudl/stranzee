@@ -17,15 +17,26 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.tasks.Task
+import com.google.gson.Gson
 import com.leminect.stranzee.R
 import com.leminect.stranzee.adapter.bindImageUrl
 import com.leminect.stranzee.databinding.ActivityMainBinding
+import com.leminect.stranzee.network.NotificationService
+import com.leminect.stranzee.network.RoomData
 import com.leminect.stranzee.network.SocketManager
 import com.leminect.stranzee.viewmodel.MainViewModel
 import com.leminect.stranzee.viewmodelfactory.MainViewModelFactory
 import de.hdodenhof.circleimageview.CircleImageView
 import io.socket.emitter.Emitter
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -39,6 +50,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prefs: SharedPreferences
     private lateinit var headerTextView: TextView
     private lateinit var headerImageView: CircleImageView
+
+    companion object {
+        const val UPDATE_REQUEST_CODE = 102
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,8 +97,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        SocketManager.setUserId(userId)
         SocketManager.setToken(token)
+        SocketManager.setUserId(userId)
+        val serviceIntent = Intent(baseContext, NotificationService::class.java)
+        serviceIntent.putExtra("userId", userId)
+        serviceIntent.putExtra("token", token)
+        startService(serviceIntent)
 
         drawerLayout = binding.drawerLayout
         val navHeaderView = binding.navView.getHeaderView(0)
@@ -95,6 +114,16 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(R.id.findFragment, R.id.chatFragment, R.id.savedFragment, R.id.profileFragment),
             binding.drawerLayout)
+
+
+        if(intent.getStringExtra("notificationDestination") == "chat") {
+            val navHostFragment =
+                (supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment)
+            val inflater = navHostFragment.navController.navInflater
+            val graph = inflater.inflate(R.navigation.main_navigation)
+            graph.startDestination = R.id.chatFragment
+            navHostFragment.navController.graph = graph
+        }
 
         setSupportActionBar(binding.topAppBar)
         setUpCustomActionBar()
@@ -120,10 +149,13 @@ class MainActivity : AppCompatActivity() {
                                 dismissDialog: (Boolean) -> Unit,
                             ) {
                                 dismissDialog(true)
+                                SocketManager.getSocket()?.emit("unsubscribe", Gson().toJson(
+                                    RoomData(userId, "", "notification", token)
+                                ))
+                                stopService(Intent(baseContext, NotificationService::class.java))
                                 prefs.edit().clear().commit()
                                 goToLoginActivity()
                             }
-
                         }, "Yes").showDialog()
                 }
                 R.id.rate_us -> {
@@ -195,6 +227,16 @@ class MainActivity : AppCompatActivity() {
             override fun onDrawerStateChanged(newState: Int) {
             }
         })
+
+        val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(this)
+        val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { result: AppUpdateInfo ->
+            if(result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && result.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(result, AppUpdateType.FLEXIBLE, this, UPDATE_REQUEST_CODE)
+                } catch (ignored: Exception) { }
+            }
+        }
     }
 
     /*var onConnect = Emitter.Listener {
@@ -254,6 +296,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        SocketManager.getSocket()?.disconnect()
+        // SocketManager.getSocket()?.disconnect()
     }
 }

@@ -13,8 +13,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
-public const val BASE_URL = "https://stranzee.herokuapp.com/" // "http://192.168.1.155:3000/"
-// "http://192.168.1.101:3000/" // "http://10.0.2.2:3000/" // "http://192.168.1.101:3000/"
+const val BASE_URL = "http://192.168.1.155:3000/"
+// "http://192.168.1.101:3000/" // "http://10.0.2.2:3000/"
 
 private val moshi: Moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())

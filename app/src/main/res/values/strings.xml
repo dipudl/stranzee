@@ -340,6 +340,8 @@
     <string name="prefs_about_me">aboutMe</string>
     <string name="prefs_email">email</string>
     <string name="prefs_signature">glide profile pic signature</string>
+    <string name="prefs_current_chat_user_id">currently chatting with</string>
+    <string name="prefs_notification_service">notification service</string>
     <string name="try_again">Try Again</string>
     <string name="reload_without_filter">Reload without filter</string>
     <string name="strangee_pagination_count">30</string>
@@ -347,7 +349,7 @@
     <string name="no_profile_found">No profile found for current filter.</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
-    <string name="contact_us_text">For any questions or concerns please email us at mail@example.com</string>
+    <string name="contact_us_text">For any questions or concerns please email us at email@example.com</string>
     <string name="share_text">Hey, Join me on %s, a free and amazing app for meeting with strangers &amp; making new friends. \n\n Play Store link: https://play.google.com/store/apps/details?id=%s</string>
     <string name="no_profile_saved">No profile saved</string>
     <string name="no_chats">No conversation yet</string>
