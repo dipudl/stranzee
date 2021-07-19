@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.leminect.stranzee.network.AuthBackData
 import com.leminect.stranzee.network.LoginDetail
 import com.leminect.stranzee.network.StrangeeApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.net.ConnectException
@@ -26,11 +29,45 @@ class LoginViewModel: ViewModel() {
 
     private val viewModelJob = Job()
 
-    fun loginUser(email: String, password: String) {
+    private var initialFcmToken: String? = null
+
+    init {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Get new FCM registration token
+                initialFcmToken = task.result
+            } else {
+                Log.i("SignUpViewModel",
+                    "Fetching FCM registration token failed at start: ${task.exception}")
+            }
+        }
+    }
+
+    fun startLoginProcess(email: String, password: String) {
+        if(initialFcmToken != null) {
+            loginUser(email, password, initialFcmToken!!)
+        } else {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Get new FCM registration token
+                    val fcmToken = task.result
+
+
+                    loginUser(email, password, fcmToken)
+                } else {
+                    Log.i("LoginViewModel",
+                        "Fetching FCM registration token failed: ${task.exception}")
+                    _status.value = LoginStatus.LOGIN_ERROR
+                }
+            }
+        }
+    }
+
+    private fun loginUser(email: String, password: String, fcmToken: String) {
         viewModelScope.launch {
             try {
                 _status.value = LoginStatus.LOGGING_IN
-                val returnedData = StrangeeApi.retrofitService.postLogin(LoginDetail(email, password))
+                val returnedData = StrangeeApi.retrofitService.postLogin(LoginDetail(email, password, fcmToken))
 
                 Log.i("LoginViewModel", returnedData.toString())
 

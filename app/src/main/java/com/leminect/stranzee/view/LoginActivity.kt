@@ -131,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
                 // begin login
                 if (viewModel.status.value != LoginStatus.LOGGING_IN) {
                     loadingDialog.showDialog()
-                    viewModel.loginUser(email, password)
+                    viewModel.startLoginProcess(email, password)
                 }
             }
         }

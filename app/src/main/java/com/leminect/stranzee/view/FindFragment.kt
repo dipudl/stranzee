@@ -192,6 +192,7 @@ class FindFragment : Fragment() {
                         }
 
                         user = user.copy(country = country, gender = gender, interestedIn = interestFilter.toList())
+                        viewModel.clearFilterResults()
                         viewModel.setFilterEnabled(true)
                         viewModel.getStrangeeList(token, user)
                     }

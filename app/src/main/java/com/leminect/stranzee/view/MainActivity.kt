@@ -29,9 +29,10 @@ import com.google.gson.Gson
 import com.leminect.stranzee.R
 import com.leminect.stranzee.adapter.bindImageUrl
 import com.leminect.stranzee.databinding.ActivityMainBinding
-import com.leminect.stranzee.network.NotificationService
 import com.leminect.stranzee.network.RoomData
 import com.leminect.stranzee.network.SocketManager
+import com.leminect.stranzee.utility.openPlayStore
+import com.leminect.stranzee.viewmodel.LOGOUT
 import com.leminect.stranzee.viewmodel.MainViewModel
 import com.leminect.stranzee.viewmodelfactory.MainViewModelFactory
 import de.hdodenhof.circleimageview.CircleImageView
@@ -50,6 +51,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prefs: SharedPreferences
     private lateinit var headerTextView: TextView
     private lateinit var headerImageView: CircleImageView
+    private lateinit var errorHybridDialog: HybridDialog
+    private lateinit var failedHybridDialog: HybridDialog
+    private lateinit var loadingDialog: CustomLoadingDialog
 
     companion object {
         const val UPDATE_REQUEST_CODE = 102
@@ -66,6 +70,37 @@ class MainActivity : AppCompatActivity() {
 
         val viewModelFactory = MainViewModelFactory(token, refreshToken, userId)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
+        loadingDialog = CustomLoadingDialog(this, false, "Logging out...")
+
+        errorHybridDialog = HybridDialog(
+            this,
+            arrayOf(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE),
+            arrayOf("Log Out Error",
+                "",
+                "",
+                "An error occurred during the log out process. Please check your internet connection!"),
+            true,
+            object : OkButtonListener {
+                override fun onOkClick(interests: String, dismissDialog: (Boolean) -> Unit) {
+                    dismissDialog(true)
+                }
+            }
+        )
+        failedHybridDialog = HybridDialog(
+            this,
+            arrayOf(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE, View.GONE),
+            arrayOf("Log out Failed",
+                "",
+                "",
+                "An error occurred during the log out process. Please try again!"),
+            true,
+            object : OkButtonListener {
+                override fun onOkClick(interests: String, dismissDialog: (Boolean) -> Unit) {
+                    dismissDialog(true)
+                }
+            }
+        )
 
         viewModel.tokenCheckData.observe(this, Observer { data ->
             data?.let {
@@ -88,7 +123,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    prefs.edit().clear().commit()
                     Toast.makeText(this,
                         "Session expired. Please login to continue.",
                         Toast.LENGTH_LONG).show()
@@ -97,12 +131,35 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        viewModel.logout.observe(this, Observer { status ->
+            status.let {
+                when(status) {
+                    LOGOUT.LOGGING_OUT -> loadingDialog.showDialog()
+                    LOGOUT.LOGOUT_ERROR -> {
+                        loadingDialog.dismissDialog()
+                        errorHybridDialog.showDialog()
+                        viewModel.onLogoutComplete()
+                    }
+                    LOGOUT.LOGOUT_FAILED -> {
+                        loadingDialog.dismissDialog()
+                        failedHybridDialog.showDialog()
+                        viewModel.onLogoutComplete()
+                    }
+                    LOGOUT.LOGOUT_SUCCESSFUL -> {
+                        loadingDialog.dismissDialog()
+                        viewModel.onLogoutComplete()
+                        goToLoginActivity()
+                    }
+                }
+            }
+        })
+
         SocketManager.setToken(token)
         SocketManager.setUserId(userId)
-        val serviceIntent = Intent(baseContext, NotificationService::class.java)
+        /*val serviceIntent = Intent(baseContext, NotificationService::class.java)
         serviceIntent.putExtra("userId", userId)
         serviceIntent.putExtra("token", token)
-        startService(serviceIntent)
+        startService(serviceIntent)*/
 
         drawerLayout = binding.drawerLayout
         val navHeaderView = binding.navView.getHeaderView(0)
@@ -116,7 +173,7 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout)
 
 
-        if(intent.getStringExtra("notificationDestination") == "chat") {
+        if(intent.getStringExtra("notificationType") == "chat") {
             val navHostFragment =
                 (supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment)
             val inflater = navHostFragment.navController.navInflater
@@ -149,26 +206,13 @@ class MainActivity : AppCompatActivity() {
                                 dismissDialog: (Boolean) -> Unit,
                             ) {
                                 dismissDialog(true)
-                                SocketManager.getSocket()?.emit("unsubscribe", Gson().toJson(
-                                    RoomData(userId, "", "notification", token)
-                                ))
-                                stopService(Intent(baseContext, NotificationService::class.java))
-                                prefs.edit().clear().commit()
-                                goToLoginActivity()
+                                // goToLoginActivity()
+                                viewModel.startLogoutProcess(token, userId)
                             }
                         }, "Yes").showDialog()
                 }
                 R.id.rate_us -> {
-                    val playStoreUrl = "https://play.google.com/store/apps/details?id=$packageName"
-
-                    try {
-                        val browserIntent = Intent(Intent.ACTION_VIEW)
-                        browserIntent.data = Uri.parse(playStoreUrl)
-                        startActivity(browserIntent)
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Failed to load. Please try again!", Toast.LENGTH_LONG)
-                            .show()
-                    }
+                    RateUsDialog(this, true)
                 }
                 R.id.contact_us -> {
                     HybridDialog(
@@ -177,7 +221,7 @@ class MainActivity : AppCompatActivity() {
                         arrayOf("Contact us",
                             "",
                             "",
-                            getString(R.string.contact_us_text)),
+                            getString(R.string.contact_us_text, getString(R.string.admin_email))),
                         true,
                         object : OkButtonListener {
                             override fun onOkClick(
@@ -237,6 +281,15 @@ class MainActivity : AppCompatActivity() {
                 } catch (ignored: Exception) { }
             }
         }
+
+        val appOpens: Int = prefs.getInt(getString(R.string.prefs_open_count), 0)
+        val ratingGiven: Boolean = prefs.getBoolean(getString(R.string.prefs_rating_given), false)
+        // open rate dialog after first 3 app opens and then after each 4 app opens if rating not given
+        if(!ratingGiven && appOpens % 4 == 2) {
+            RateUsDialog(this)
+        }
+
+        prefs.edit().putInt(getString(R.string.prefs_open_count), appOpens + 1).apply()
     }
 
     /*var onConnect = Emitter.Listener {
@@ -265,6 +318,12 @@ class MainActivity : AppCompatActivity() {
     }*/
 
     private fun goToLoginActivity() {
+        /*SocketManager.getSocket()?.emit("unsubscribe", Gson().toJson(
+            RoomData(userId, "", "notification", token)
+        ))
+        stopService(Intent(baseContext, NotificationService::class.java))*/
+
+        prefs.edit().clear().commit()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
@@ -296,6 +355,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // SocketManager.getSocket()?.disconnect()
+        // comment the line below(having disconnect()) if NotificationService is running
+        // currently Firebase is used for notification
+        SocketManager.getSocket()?.disconnect()
     }
 }

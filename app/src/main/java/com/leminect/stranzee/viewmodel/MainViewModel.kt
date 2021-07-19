@@ -9,6 +9,9 @@ import com.leminect.stranzee.network.StrangeeApi
 import com.leminect.stranzee.network.TokenCheck
 import kotlinx.coroutines.launch
 import java.net.ConnectException
+import java.net.UnknownHostException
+
+enum class LOGOUT { LOGGING_OUT, LOGOUT_ERROR, LOGOUT_FAILED, LOGOUT_SUCCESSFUL }
 
 class MainViewModel(
     private val token: String,
@@ -19,6 +22,10 @@ class MainViewModel(
     private val _tokenCheckData = MutableLiveData<TokenCheck>()
     val tokenCheckData: LiveData<TokenCheck>
         get() = _tokenCheckData
+
+    private val _logout = MutableLiveData<LOGOUT>()
+    val logout: LiveData<LOGOUT>
+        get() = _logout
 
     init {
         checkToken()
@@ -49,8 +56,36 @@ class MainViewModel(
         }
     }
 
+    fun startLogoutProcess(token: String, userId: String) {
+        viewModelScope.launch {
+            _logout.value = LOGOUT.LOGGING_OUT
+            try {
+                val result = StrangeeApi.retrofitService.refreshFcmToken("Bearer ".plus(token), userId, null)
+
+                if(result) {
+                    _logout.value = LOGOUT.LOGOUT_SUCCESSFUL
+                } else {
+                    _logout.value = LOGOUT.LOGOUT_FAILED
+                }
+            } catch (t: ConnectException) {
+                Log.i("MainViewModel", "Connection_Error ::: $t")
+                _logout.value = LOGOUT.LOGOUT_ERROR
+            } catch (t: UnknownHostException) {
+                Log.i("LoginViewModel", "HOST EXCEPTION ::: $t")
+                _logout.value = LOGOUT.LOGOUT_ERROR
+            } catch (t: Throwable) {
+                Log.i("MainViewModel", "Failed ::: $t")
+                _logout.value = LOGOUT.LOGOUT_FAILED
+            }
+        }
+    }
+
     fun onTokenDataChecked() {
         _tokenCheckData.value = null
+    }
+
+    fun onLogoutComplete() {
+        _logout.value = null
     }
 
     override fun onCleared() {

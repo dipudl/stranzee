@@ -6,7 +6,7 @@ An android app to discover, chat and connect with strangers and make new friends
 
 Some screens:
 
-![App mockup](https://drive.google.com/uc?export=view&id=1PdWwzcpVAYGeMHgAVqP7bcziQS111C-v)
+![App mockup](https://drive.google.com/uc?export=view&id=1D-TqgWVAOmVyWWURaW_i4cvhlcNg3IlN)
 
 ## Getting Started
 

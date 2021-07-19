@@ -342,6 +342,8 @@
     <string name="prefs_signature">glide profile pic signature</string>
     <string name="prefs_current_chat_user_id">currently chatting with</string>
     <string name="prefs_notification_service">notification service</string>
+    <string name="prefs_open_count">open count</string>
+    <string name="prefs_rating_given">rating given</string>
     <string name="try_again">Try Again</string>
     <string name="reload_without_filter">Reload without filter</string>
     <string name="strangee_pagination_count">30</string>
@@ -349,7 +351,8 @@
     <string name="no_profile_found">No profile found for current filter.</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer close</string>
-    <string name="contact_us_text">For any questions or concerns please email us at email@example.com</string>
+    <string name="admin_email">mail@example.com</string>
+    <string name="contact_us_text">For any questions or concerns please email us at %s</string>
     <string name="share_text">Hey, Join me on %s, a free and amazing app for meeting with strangers &amp; making new friends. \n\n Play Store link: https://play.google.com/store/apps/details?id=%s</string>
     <string name="no_profile_saved">No profile saved</string>
     <string name="no_chats">No conversation yet</string>
@@ -370,6 +373,12 @@
     <string name="glide_image_error">An error occurred.\nTry again!</string>
     <string name="uploading_image">Uploading image...</string>
     <string name="forgot_password_top_text">Please enter your email address to get the password reset link</string>
+
+    <string name="default_notification_channel_id">admin_channel</string>
+    <string name="rate_us_title">Rate us</string>
+    <string name="feedback">Feedback</string>
+    <string name="rate_us_dialog_text">Stranzee app currently does not have any ads or in-app purchases and is solely focused on providing best user experience.\nHelp us grow by rating us and providing your feedback.</string>
+    <string name="don_t_show_again">Don\'t ask again</string>
 
     <bool name="_true">true</bool>
     <bool name="_false">false</bool>

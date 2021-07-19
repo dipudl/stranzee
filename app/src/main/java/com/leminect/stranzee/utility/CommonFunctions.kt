@@ -2,9 +2,12 @@ package com.leminect.stranzee.utility
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.leminect.stranzee.R
@@ -95,8 +98,37 @@ fun getFromSharedPreferences(context: Context): Pair<String, User> {
     return Pair(token!!, user)
 }
 
+fun getUidFromSharedPreferences(context: Context): String {
+    val prefs = context.getSharedPreferences(context.getString(R.string.shared_prefs_name),
+        AppCompatActivity.MODE_PRIVATE)
+
+    return prefs.getString(context.getString(R.string.prefs_user_id), "")!!
+}
+
 fun File.getMimeType(fallback: String = "image/*"): String {
     return MimeTypeMap.getFileExtensionFromUrl(toString())
         ?.run { MimeTypeMap.getSingleton().getMimeTypeFromExtension(toLowerCase(Locale.ROOT)) }
         ?: fallback // You might set it to */*
+}
+
+fun openPlayStore(context: Context) {
+    val playStoreUrl = "https://play.google.com/store/apps/details?id=${context.applicationContext.packageName}"
+
+    try {
+        val browserIntent = Intent(Intent.ACTION_VIEW)
+        browserIntent.data = Uri.parse(playStoreUrl)
+        context.startActivity(browserIntent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "Failed to load. Please try again!", Toast.LENGTH_LONG)
+            .show()
+    }
+}
+
+fun openEmailClient(context: Context) {
+    try {
+        val intent: Intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${context.getString(R.string.admin_email)}?subject=Feedback"))
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }

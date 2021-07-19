@@ -17,10 +17,10 @@ import java.util.*
 
 data class Notification(
     val title: String,
-    val message: String,
+    val body: String,
     val senderId: String,
     val receiverId: String,
-    val type: String,
+    val notificationType: String,
 ) {
     companion object {
         const val ADMIN_CHANNEL_ID: String = "admin_channel"
@@ -35,8 +35,8 @@ data class Notification(
         }
 
         val intentActivity: Intent = Intent(context, MainActivity::class.java)
-        if(type == "chat") {
-            intentActivity.putExtra("notificationDestination", "chat")
+        if(notificationType == "chat") {
+            intentActivity.putExtra("notificationType", "chat")
             intentActivity.putExtra("senderId", senderId)
         }
         intentActivity.action = Intent.ACTION_MAIN
@@ -49,10 +49,10 @@ data class Notification(
 
         val notificationSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(context, ADMIN_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setSmallIcon(R.drawable.ic_for_notification)
             //.setLargeIcon(largeIcon)
             .setContentTitle(title)
-            .setContentText(message)
+            .setContentText(body)
             .setAutoCancel(true)
             .setSound(notificationSoundUri)
             .setContentIntent(contentIntent)

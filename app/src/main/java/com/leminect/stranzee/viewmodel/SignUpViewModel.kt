@@ -5,15 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.leminect.stranzee.model.User
 import com.leminect.stranzee.network.CheckRegistrationInput
 import com.leminect.stranzee.network.AuthBackData
 import com.leminect.stranzee.network.StrangeeApi
 import com.leminect.stranzee.utility.getMimeType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -31,6 +29,21 @@ class SignUpViewModel : ViewModel() {
         get() = _signUpBackData
 
     private val viewModelJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    private var initialFcmToken: String? = null
+
+    init {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Get new FCM registration token
+                 initialFcmToken = task.result
+            } else {
+                Log.i("SignUpViewModel",
+                    "Fetching FCM registration token failed at start: ${task.exception}")
+            }
+        }
+    }
 
     fun checkAndSignUpUser(input: CheckRegistrationInput, user: User) {
         viewModelScope.launch {
@@ -43,8 +56,13 @@ class SignUpViewModel : ViewModel() {
                 if (checkUserRegistration.userNotExist) {
                     _status.value = SignUpStatus.CHECK_PASSED
 
-                    // sign up user
-                    signUpUser(user)
+                    if(initialFcmToken != null) {
+                        //sign up user
+                        signUpUser(user, initialFcmToken!!)
+                    } else {
+                        // Generate FCM token and sign up user
+                        generateFcmToken(user)
+                    }
 
                 } else {
                     _status.value = SignUpStatus.CHECK_FAILED
@@ -56,7 +74,24 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    private suspend fun signUpUser(user: User) {
+    private fun generateFcmToken(user: User) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Get new FCM registration token
+                val fcmToken = task.result
+
+                uiScope.launch {
+                    signUpUser(user, fcmToken)
+                }
+            } else {
+                Log.i("SignUpViewModel",
+                    "Fetching FCM registration token failed: ${task.exception}")
+                _status.value = SignUpStatus.SIGN_UP_FAILED
+            }
+        }
+    }
+
+    private suspend fun signUpUser(user: User, fcmToken: String) {
         withContext(Dispatchers.Main) {
             try {
                 _status.value = SignUpStatus.SIGNING_UP
@@ -84,7 +119,9 @@ class SignUpViewModel : ViewModel() {
                     RequestBody.create(MediaType.parse("text/plain"), user.gender),
                     RequestBody.create(MediaType.parse("text/plain"), user.aboutMe),
                     RequestBody.create(MediaType.parse("text/plain"), interestArrayString),
-                    RequestBody.create(MediaType.parse("text/plain"), user.birthday.toString()))
+                    RequestBody.create(MediaType.parse("text/plain"), user.birthday.toString()),
+                    RequestBody.create(MediaType.parse("text/plain"), fcmToken)
+                )
 
                 Log.i("SignUpViewModel", signUpServerData.toString())
 
@@ -94,6 +131,7 @@ class SignUpViewModel : ViewModel() {
                 } else {
                     _status.value = SignUpStatus.SIGN_UP_FAILED
                 }
+
             } catch (t: Throwable) {
                 Log.i("SignUpViewModel", "SIGN_UP_Error ::: $t")
                 _status.value = SignUpStatus.SIGN_UP_ERROR

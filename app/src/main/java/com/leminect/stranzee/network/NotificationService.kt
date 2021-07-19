@@ -60,7 +60,7 @@ class NotificationService : Service() {
             SocketManager.gson.fromJson(it[0].toString(), Notification::class.java)
 
         if (notification.receiverId == userId) {
-            if (notification.type != "chat" || prefs?.getString(getString(R.string.prefs_current_chat_user_id),
+            if (notification.notificationType != "chat" || prefs?.getString(getString(R.string.prefs_current_chat_user_id),
                     null) != notification.senderId
             ) {
                 notification.show(applicationContext)

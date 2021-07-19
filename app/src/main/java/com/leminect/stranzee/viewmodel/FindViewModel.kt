@@ -35,6 +35,10 @@ class FindViewModel(token: String, user: User) : ViewModel() {
     val scrollPaginationEnabled: LiveData<Boolean>
         get() = _scrollPaginationEnabled
 
+    private val _filteredResultsAreInTheScreen = MutableLiveData<Boolean>()
+    val filteredResultsAreInTheScreen: LiveData<Boolean>
+        get() = _filteredResultsAreInTheScreen
+
     private val _saveBackData = MutableLiveData<SaveStrangeeBackData>()
     val saveBackData: LiveData<SaveStrangeeBackData>
         get() = _saveBackData
@@ -65,11 +69,14 @@ class FindViewModel(token: String, user: User) : ViewModel() {
         _navigateToSelectedStrangee.value = null
     }
 
+    fun clearFilterResults() {
+        _strangeeList.value = listOf<Strangee>()
+        _lastCreatedAt.value = null
+    }
+
     fun getStrangeeList(token: String, user: User, changeStatus: Boolean = true) {
-        if (_filterEnabled.value == true) {
-            _strangeeList.value = listOf<Strangee>()
-            _scrollPaginationEnabled.value = null
-            _lastCreatedAt.value = null
+        if (_filterEnabled.value == true && _filteredResultsAreInTheScreen.value != true) {
+            clearFilterResults()
         }
 
         _scrollPaginationEnabled.value = false
@@ -91,6 +98,8 @@ class FindViewModel(token: String, user: User) : ViewModel() {
                     _strangeeList.value = (_strangeeList.value ?: listOf()) + backResult.data
                     if (changeStatus) _status.value = FindStatus.DONE
                     _lastCreatedAt.value = backResult.createdAt
+
+                    _filteredResultsAreInTheScreen.value = backResult.isFilterEnabled
 
                     Log.i("FindViewModel", "CreatedOn: ${backResult.createdAt}")
                 }

@@ -51,7 +51,6 @@ object SocketManager {
 
     private fun setupSocket() {
         try {
-            //This address is the way you can connect to localhost with AVD(Android Virtual Device)
             mSocket = IO.socket(BASE_URL)
             Log.d("success", mSocket?.id().toString())
 

@@ -42,6 +42,7 @@ data class TokenCheck(
 data class LoginDetail(
     val email: String,
     val password: String,
+    val fcmToken: String,
 )
 
 data class CheckRegistrationInput(
@@ -55,6 +56,7 @@ data class CheckRegistration(
 data class StrangeeBackData(
     val data: List<Strangee>,
     val createdAt: String,
+    val isFilterEnabled: Boolean
 )
 
 data class SaveStrangeeBackData(
@@ -93,6 +95,7 @@ interface StrangeeApiService {
         @Part("aboutMe") aboutMe: RequestBody,
         @Part("interestedIn") interestedIn: RequestBody,
         @Part("birthday") birthday: RequestBody,
+        @Part("fcmToken") fcmToken: RequestBody,
     ): AuthBackData
 
     @Multipart
@@ -213,6 +216,13 @@ interface StrangeeApiService {
     suspend fun removeWhoCheckedMe(
         @Header("Authorization") token: String,
         @Query("_id") strangeeUserId: String,
+    ): Boolean
+
+    @POST("refreshFcmToken")
+    suspend fun refreshFcmToken(
+        @Header("Authorization") token: String,
+        @Query("_id") userId: String,
+        @Query("fcmToken") fcmToken: String?,
     ): Boolean
 }
 
